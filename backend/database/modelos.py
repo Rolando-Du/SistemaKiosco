@@ -40,3 +40,25 @@ class Producto(Base):
     stock_minimo = Column(Integer, nullable=False, default=0)
     activo = Column(Boolean, nullable=False, default=True)
     fecha_creacion = Column(DateTime, nullable=False, default=datetime.now)
+
+
+class Venta(Base):
+    __tablename__ = "ventas"
+
+    id = Column(Integer, primary_key=True, index=True)
+    usuario_id = Column(Integer, ForeignKey("usuarios.id"), nullable=False)
+    total = Column(Numeric(10, 2), nullable=False, default=0)
+    metodo_pago = Column(String(30), nullable=False, default="EFECTIVO")
+    estado = Column(String(30), nullable=False, default="FINALIZADA")
+    fecha_creacion = Column(DateTime, nullable=False, default=datetime.now)
+
+
+class VentaDetalle(Base):
+    __tablename__ = "ventas_detalle"
+
+    id = Column(Integer, primary_key=True, index=True)
+    venta_id = Column(Integer, ForeignKey("ventas.id"), nullable=False)
+    producto_id = Column(Integer, ForeignKey("productos.id"), nullable=False)
+    cantidad = Column(Integer, nullable=False)
+    precio_unitario = Column(Numeric(10, 2), nullable=False)
+    subtotal = Column(Numeric(10, 2), nullable=False)
