@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.pyc
+
+# Entorno virtual
+backend/entorno/
+
+# Base de datos local
+backend/kiosco.db
+
+# Backups
+backups/
+
+# Variables de entorno
+.env
+backend/.env
+
+# VS Code
+.vscode/
+
+# Sistema
+.DS_Store
+Thumbs.db
