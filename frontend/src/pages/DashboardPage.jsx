@@ -2,25 +2,58 @@ import { useEffect, useState } from "react";
 
 import { obtenerResumenGeneral } from "../services/reportesService";
 
+function formatearDinero(valor) {
+  return new Intl.NumberFormat("es-AR", {
+    style: "currency",
+    currency: "ARS",
+    maximumFractionDigits: 0,
+  }).format(valor);
+}
+
 function DashboardPage() {
   const [resumen, setResumen] = useState(null);
   const [cargando, setCargando] = useState(true);
+  const [actualizando, setActualizando] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    async function cargarResumen() {
-      try {
-        const datos = await obtenerResumenGeneral();
-        setResumen(datos);
-      } catch (error) {
-        setError(error.message);
-      } finally {
-        setCargando(false);
-      }
-    }
+    let componenteActivo = true;
 
-    cargarResumen();
+    obtenerResumenGeneral()
+      .then((datos) => {
+        if (componenteActivo) {
+          setResumen(datos);
+        }
+      })
+      .catch((error) => {
+        if (componenteActivo) {
+          setError(error.message);
+        }
+      })
+      .finally(() => {
+        if (componenteActivo) {
+          setCargando(false);
+        }
+      });
+
+    return () => {
+      componenteActivo = false;
+    };
   }, []);
+
+  async function actualizarDashboard() {
+    try {
+      setActualizando(true);
+      setError("");
+
+      const datos = await obtenerResumenGeneral();
+      setResumen(datos);
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setActualizando(false);
+    }
+  }
 
   if (cargando) {
     return (
@@ -30,7 +63,7 @@ function DashboardPage() {
     );
   }
 
-  if (error) {
+  if (error && !resumen) {
     return (
       <div className="rounded-2xl bg-red-50 p-6 text-red-700 shadow-sm">
         <h2 className="text-xl font-bold">Error al cargar el dashboard</h2>
@@ -46,20 +79,36 @@ function DashboardPage() {
           <div>
             <h2 className="text-3xl font-bold text-slate-900">Dashboard</h2>
             <p className="mt-2 text-slate-500">
-              Resumen general del sistema
+              Resumen general actualizado del sistema
             </p>
           </div>
 
-          <span className="rounded-full bg-green-100 px-4 py-2 text-sm font-medium text-green-700">
-            Backend conectado
-          </span>
+          <div className="flex items-center gap-3">
+            <span className="rounded-full bg-green-100 px-4 py-2 text-sm font-medium text-green-700">
+              Sistema activo
+            </span>
+
+            <button
+              onClick={actualizarDashboard}
+              disabled={actualizando}
+              className="rounded-xl bg-blue-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-400"
+            >
+              {actualizando ? "Actualizando..." : "Actualizar datos"}
+            </button>
+          </div>
         </div>
       </header>
+
+      {error && (
+        <div className="mb-6 rounded-2xl bg-red-50 p-4 text-red-700 shadow-sm">
+          {error}
+        </div>
+      )}
 
       <section className="grid grid-cols-4 gap-5">
         <div className="rounded-2xl bg-white p-6 shadow-sm">
           <p className="text-sm font-medium text-slate-500">Productos</p>
-          <strong className="mt-3 block text-3xl font-bold">
+          <strong className="mt-3 block text-3xl font-bold text-slate-900">
             {resumen.total_productos}
           </strong>
           <p className="mt-2 text-sm text-slate-400">Total cargados</p>
@@ -67,8 +116,8 @@ function DashboardPage() {
 
         <div className="rounded-2xl bg-white p-6 shadow-sm">
           <p className="text-sm font-medium text-slate-500">Ventas</p>
-          <strong className="mt-3 block text-3xl font-bold">
-            ${resumen.total_ventas}
+          <strong className="mt-3 block text-3xl font-bold text-slate-900">
+            {formatearDinero(resumen.total_ventas)}
           </strong>
           <p className="mt-2 text-sm text-slate-400">
             {resumen.cantidad_ventas} ventas realizadas
@@ -77,8 +126,8 @@ function DashboardPage() {
 
         <div className="rounded-2xl bg-white p-6 shadow-sm">
           <p className="text-sm font-medium text-slate-500">Compras</p>
-          <strong className="mt-3 block text-3xl font-bold">
-            ${resumen.total_compras}
+          <strong className="mt-3 block text-3xl font-bold text-slate-900">
+            {formatearDinero(resumen.total_compras)}
           </strong>
           <p className="mt-2 text-sm text-slate-400">
             {resumen.cantidad_compras} compras realizadas
@@ -87,39 +136,60 @@ function DashboardPage() {
 
         <div className="rounded-2xl bg-white p-6 shadow-sm">
           <p className="text-sm font-medium text-slate-500">Stock bajo</p>
-          <strong className="mt-3 block text-3xl font-bold">
+          <strong
+            className={`mt-3 block text-3xl font-bold ${
+              resumen.productos_stock_bajo > 0
+                ? "text-red-600"
+                : "text-green-700"
+            }`}
+          >
             {resumen.productos_stock_bajo}
           </strong>
           <p className="mt-2 text-sm text-slate-400">Productos a reponer</p>
         </div>
       </section>
 
-      <section className="mt-6 rounded-2xl bg-white p-6 shadow-sm">
-        <h3 className="text-xl font-bold text-slate-900">
-          Resumen operativo
-        </h3>
+      <section className="mt-6 grid grid-cols-3 gap-5">
+        <div className="rounded-2xl bg-white p-6 shadow-sm">
+          <p className="text-sm font-medium text-slate-500">
+            Proveedores activos
+          </p>
+          <strong className="mt-3 block text-3xl font-bold text-slate-900">
+            {resumen.total_proveedores}
+          </strong>
+          <p className="mt-2 text-sm text-slate-400">
+            Proveedores disponibles para compras
+          </p>
+        </div>
 
-        <div className="mt-4 grid grid-cols-3 gap-4 text-sm">
-          <div className="rounded-xl bg-slate-50 p-4">
-            <p className="text-slate-500">Proveedores activos</p>
-            <strong className="mt-2 block text-2xl">
-              {resumen.total_proveedores}
-            </strong>
-          </div>
+        <div className="rounded-2xl bg-white p-6 shadow-sm">
+          <p className="text-sm font-medium text-slate-500">
+            Promedio por venta
+          </p>
+          <strong className="mt-3 block text-3xl font-bold text-slate-900">
+            {resumen.cantidad_ventas > 0
+              ? formatearDinero(resumen.total_ventas / resumen.cantidad_ventas)
+              : formatearDinero(0)}
+          </strong>
+          <p className="mt-2 text-sm text-slate-400">
+            Total vendido dividido por ventas
+          </p>
+        </div>
 
-          <div className="rounded-xl bg-slate-50 p-4">
-            <p className="text-slate-500">Cantidad de ventas</p>
-            <strong className="mt-2 block text-2xl">
-              {resumen.cantidad_ventas}
-            </strong>
-          </div>
-
-          <div className="rounded-xl bg-slate-50 p-4">
-            <p className="text-slate-500">Cantidad de compras</p>
-            <strong className="mt-2 block text-2xl">
-              {resumen.cantidad_compras}
-            </strong>
-          </div>
+        <div className="rounded-2xl bg-white p-6 shadow-sm">
+          <p className="text-sm font-medium text-slate-500">
+            Promedio por compra
+          </p>
+          <strong className="mt-3 block text-3xl font-bold text-slate-900">
+            {resumen.cantidad_compras > 0
+              ? formatearDinero(
+                  resumen.total_compras / resumen.cantidad_compras,
+                )
+              : formatearDinero(0)}
+          </strong>
+          <p className="mt-2 text-sm text-slate-400">
+            Total comprado dividido por compras
+          </p>
         </div>
       </section>
     </div>
