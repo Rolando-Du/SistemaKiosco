@@ -47,9 +47,18 @@ function MainLayout() {
               Ventas POS
             </NavLink>
 
-            <button className="rounded-xl bg-slate-800 px-4 py-3 text-left text-sm font-medium text-slate-200 hover:bg-slate-700">
+            <NavLink
+              to="/caja"
+              className={({ isActive }) =>
+                `rounded-xl px-4 py-3 text-sm font-medium transition ${
+                  isActive
+                    ? "bg-blue-600 text-white"
+                    : "bg-slate-800 text-slate-200 hover:bg-slate-700"
+                }`
+              }
+            >
               Caja
-            </button>
+            </NavLink>
 
             <button className="rounded-xl bg-slate-800 px-4 py-3 text-left text-sm font-medium text-slate-200 hover:bg-slate-700">
               Compras
