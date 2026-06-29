@@ -62,3 +62,17 @@ class VentaDetalle(Base):
     cantidad = Column(Integer, nullable=False)
     precio_unitario = Column(Numeric(10, 2), nullable=False)
     subtotal = Column(Numeric(10, 2), nullable=False)
+
+
+class Caja(Base):
+    __tablename__ = "cajas"
+
+    id = Column(Integer, primary_key=True, index=True)
+    usuario_id = Column(Integer, ForeignKey("usuarios.id"), nullable=False)
+    monto_inicial = Column(Numeric(10, 2), nullable=False, default=0)
+    monto_final = Column(Numeric(10, 2), nullable=True)
+    total_ventas = Column(Numeric(10, 2), nullable=False, default=0)
+    diferencia = Column(Numeric(10, 2), nullable=True)
+    estado = Column(String(30), nullable=False, default="ABIERTA")
+    fecha_apertura = Column(DateTime, nullable=False, default=datetime.now)
+    fecha_cierre = Column(DateTime, nullable=True)
