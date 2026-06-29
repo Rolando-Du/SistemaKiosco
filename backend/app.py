@@ -4,6 +4,8 @@ from routers.usuarios import router as usuarios_router
 from routers.productos import router as productos_router
 from routers.ventas import router as ventas_router
 from routers.caja import router as caja_router
+from routers.proveedores import router as proveedores_router
+from routers.compras import router as compras_router
 
 app = FastAPI(
     title="Sistema Kiosco API",
@@ -15,6 +17,8 @@ app.include_router(usuarios_router)
 app.include_router(productos_router)
 app.include_router(ventas_router)
 app.include_router(caja_router)
+app.include_router(proveedores_router)
+app.include_router(compras_router)
 
 
 @app.get("/")

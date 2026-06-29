@@ -76,3 +76,37 @@ class Caja(Base):
     estado = Column(String(30), nullable=False, default="ABIERTA")
     fecha_apertura = Column(DateTime, nullable=False, default=datetime.now)
     fecha_cierre = Column(DateTime, nullable=True)
+
+
+class Proveedor(Base):
+    __tablename__ = "proveedores"
+
+    id = Column(Integer, primary_key=True, index=True)
+    nombre = Column(String(150), nullable=False)
+    telefono = Column(String(50), nullable=True)
+    email = Column(String(100), nullable=True)
+    direccion = Column(String(200), nullable=True)
+    activo = Column(Boolean, nullable=False, default=True)
+    fecha_creacion = Column(DateTime, nullable=False, default=datetime.now)
+
+
+class Compra(Base):
+    __tablename__ = "compras"
+
+    id = Column(Integer, primary_key=True, index=True)
+    proveedor_id = Column(Integer, ForeignKey("proveedores.id"), nullable=False)
+    usuario_id = Column(Integer, ForeignKey("usuarios.id"), nullable=False)
+    total = Column(Numeric(10, 2), nullable=False, default=0)
+    estado = Column(String(30), nullable=False, default="FINALIZADA")
+    fecha_creacion = Column(DateTime, nullable=False, default=datetime.now)
+
+
+class CompraDetalle(Base):
+    __tablename__ = "compras_detalle"
+
+    id = Column(Integer, primary_key=True, index=True)
+    compra_id = Column(Integer, ForeignKey("compras.id"), nullable=False)
+    producto_id = Column(Integer, ForeignKey("productos.id"), nullable=False)
+    cantidad = Column(Integer, nullable=False)
+    precio_unitario = Column(Numeric(10, 2), nullable=False)
+    subtotal = Column(Numeric(10, 2), nullable=False)
