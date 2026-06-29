@@ -60,10 +60,6 @@ function MainLayout() {
               Caja
             </NavLink>
 
-            <button className="rounded-xl bg-slate-800 px-4 py-3 text-left text-sm font-medium text-slate-200 hover:bg-slate-700">
-              Compras
-            </button>
-
             <NavLink
               to="/proveedores"
               className={({ isActive }) =>
@@ -75,6 +71,18 @@ function MainLayout() {
               }
             >
               Proveedores
+            </NavLink>
+            <NavLink
+              to="/compras"
+              className={({ isActive }) =>
+                `rounded-xl px-4 py-3 text-sm font-medium transition ${
+                  isActive
+                    ? "bg-blue-600 text-white"
+                    : "bg-slate-800 text-slate-200 hover:bg-slate-700"
+                }`
+              }
+            >
+              Compras
             </NavLink>
           </nav>
         </aside>
