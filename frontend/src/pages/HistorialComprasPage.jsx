@@ -65,7 +65,7 @@ function HistorialComprasPage() {
 
   function obtenerNombreProveedor(proveedorId) {
     const proveedor = proveedores.find(
-      (item) => item.id === Number(proveedorId)
+      (item) => item.id === Number(proveedorId),
     );
 
     return proveedor ? proveedor.nombre : `Proveedor #${proveedorId}`;
@@ -86,9 +86,9 @@ function HistorialComprasPage() {
   return (
     <div>
       <header className="mb-8 rounded-2xl bg-white p-6 shadow-sm">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
           <div>
-            <h2 className="text-3xl font-bold text-slate-900">
+            <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl">
               Historial de compras
             </h2>
             <p className="mt-2 text-slate-500">
@@ -99,7 +99,7 @@ function HistorialComprasPage() {
           <button
             onClick={actualizarCompras}
             disabled={actualizando}
-            className="rounded-xl bg-blue-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-400"
+            className="w-full rounded-xl bg-blue-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-400 sm:w-auto"
           >
             {actualizando ? "Actualizando..." : "Actualizar compras"}
           </button>
@@ -112,10 +112,10 @@ function HistorialComprasPage() {
         </div>
       )}
 
-      <section className="mb-6 grid grid-cols-3 gap-5">
+      <section className="mb-6 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
         <div className="rounded-2xl bg-white p-6 shadow-sm">
           <p className="text-sm font-medium text-slate-500">Compras</p>
-          <strong className="mt-3 block text-3xl font-bold text-slate-900">
+          <strong className="mt-3 block text-2xl font-bold text-slate-900 sm:text-3xl">
             {compras.length}
           </strong>
           <p className="mt-2 text-sm text-slate-400">Total registradas</p>
@@ -123,7 +123,7 @@ function HistorialComprasPage() {
 
         <div className="rounded-2xl bg-white p-6 shadow-sm">
           <p className="text-sm font-medium text-slate-500">Total comprado</p>
-          <strong className="mt-3 block text-3xl font-bold text-slate-900">
+          <strong className="mt-3 block wrap-break-word text-2xl font-bold text-slate-900 sm:text-3xl">
             {formatearDinero(calcularTotalComprado())}
           </strong>
           <p className="mt-2 text-sm text-slate-400">Importe acumulado</p>
@@ -131,7 +131,7 @@ function HistorialComprasPage() {
 
         <div className="rounded-2xl bg-white p-6 shadow-sm">
           <p className="text-sm font-medium text-slate-500">Promedio</p>
-          <strong className="mt-3 block text-3xl font-bold text-slate-900">
+          <strong className="mt-3 block wrap-break-word text-2xl font-bold text-slate-900 sm:text-3xl">
             {compras.length > 0
               ? formatearDinero(calcularTotalComprado() / compras.length)
               : formatearDinero(0)}
@@ -140,9 +140,65 @@ function HistorialComprasPage() {
         </div>
       </section>
 
-      <section className="rounded-2xl bg-white p-6 shadow-sm">
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse text-left">
+      <section className="rounded-2xl bg-white p-4 shadow-sm sm:p-6">
+        <div className="space-y-4 md:hidden">
+          {compras.map((compra) => (
+            <article
+              key={compra.id}
+              className="rounded-2xl border border-slate-100 bg-slate-50 p-4"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-xs text-slate-400">Compra</p>
+                  <strong className="text-slate-900">#{compra.id}</strong>
+                </div>
+
+                <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-bold text-green-700">
+                  {compra.estado}
+                </span>
+              </div>
+
+              <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <div className="rounded-xl bg-white p-3">
+                  <p className="text-sm text-slate-500">Proveedor</p>
+                  <strong className="mt-1 block wrap-break-word text-slate-900">
+                    {obtenerNombreProveedor(compra.proveedor_id)}
+                  </strong>
+                </div>
+
+                <div className="rounded-xl bg-white p-3">
+                  <p className="text-sm text-slate-500">Total</p>
+                  <strong className="mt-1 block text-slate-900">
+                    {formatearDinero(compra.total)}
+                  </strong>
+                </div>
+
+                <div className="rounded-xl bg-white p-3">
+                  <p className="text-sm text-slate-500">Usuario</p>
+                  <strong className="mt-1 block text-slate-900">
+                    Usuario #{compra.usuario_id}
+                  </strong>
+                </div>
+
+                <div className="rounded-xl bg-white p-3">
+                  <p className="text-sm text-slate-500">Fecha</p>
+                  <strong className="mt-1 block wrap-break-word text-slate-900">
+                    {new Date(compra.fecha_creacion).toLocaleString()}
+                  </strong>
+                </div>
+              </div>
+            </article>
+          ))}
+
+          {compras.length === 0 && (
+            <div className="rounded-xl bg-slate-50 p-4 text-sm text-slate-500">
+              Todavía no hay compras registradas.
+            </div>
+          )}
+        </div>
+
+        <div className="hidden overflow-x-auto md:block">
+          <table className="min-w-225 border-collapse text-left">
             <thead>
               <tr className="border-b border-slate-200 text-sm text-slate-500">
                 <th className="px-4 py-3">N° compra</th>

@@ -21,9 +21,9 @@ function MainLayout() {
 
   return (
     <div className="min-h-screen bg-slate-100 text-slate-900">
-      <div className="flex min-h-screen">
-        <aside className="flex w-72 flex-col bg-slate-950 p-6 text-white">
-          <div>
+      <div className="flex min-h-screen flex-col lg:flex-row">
+        <aside className="flex w-full flex-col bg-slate-950 p-6 text-white lg:sticky lg:top-0 lg:h-screen lg:w-72 lg:shrink-0">
+          <div className="min-h-0 flex-1 overflow-y-auto pr-1">
             <h1 className="text-2xl font-bold">Sistema Kiosco</h1>
 
             <div className="mt-4 rounded-2xl bg-slate-900 p-4">
@@ -36,7 +36,7 @@ function MainLayout() {
               </p>
             </div>
 
-            <nav className="mt-8 flex flex-col gap-6">
+            <nav className="mt-8 flex flex-col gap-6 pb-6">
               <div>
                 <p className="mb-2 px-2 text-xs font-bold uppercase tracking-wide text-slate-500">
                   Inicio
@@ -111,15 +111,17 @@ function MainLayout() {
             </nav>
           </div>
 
-          <button
-            onClick={manejarCerrarSesion}
-            className="mt-8 rounded-xl bg-red-600 px-4 py-3 text-left text-sm font-bold text-white transition hover:bg-red-700"
-          >
-            Cerrar sesión
-          </button>
+          <div className="shrink-0 border-t border-slate-800 pt-4">
+            <button
+              onClick={manejarCerrarSesion}
+              className="w-full rounded-xl bg-red-600 px-4 py-3 text-left text-sm font-bold text-white transition hover:bg-red-700"
+            >
+              Cerrar sesión
+            </button>
+          </div>
         </aside>
 
-        <main className="flex-1 p-8">
+        <main className="min-w-0 flex-1 p-4 sm:p-6 lg:p-8">
           <Outlet />
         </main>
       </div>

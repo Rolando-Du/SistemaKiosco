@@ -75,16 +75,18 @@ function DashboardPage() {
   return (
     <div>
       <header className="mb-8 rounded-2xl bg-white p-6 shadow-sm">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <h2 className="text-3xl font-bold text-slate-900">Dashboard</h2>
+            <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl">
+              Dashboard
+            </h2>
             <p className="mt-2 text-slate-500">
               Resumen general actualizado del sistema
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
-            <span className="rounded-full bg-green-100 px-4 py-2 text-sm font-medium text-green-700">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <span className="w-fit rounded-full bg-green-100 px-4 py-2 text-sm font-medium text-green-700">
               Sistema activo
             </span>
 
@@ -105,10 +107,10 @@ function DashboardPage() {
         </div>
       )}
 
-      <section className="grid grid-cols-4 gap-5">
+      <section className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
         <div className="rounded-2xl bg-white p-6 shadow-sm">
           <p className="text-sm font-medium text-slate-500">Productos</p>
-          <strong className="mt-3 block text-3xl font-bold text-slate-900">
+          <strong className="mt-3 block text-2xl font-bold text-slate-900 lg:text-3xl">
             {resumen.total_productos}
           </strong>
           <p className="mt-2 text-sm text-slate-400">Total cargados</p>
@@ -116,7 +118,7 @@ function DashboardPage() {
 
         <div className="rounded-2xl bg-white p-6 shadow-sm">
           <p className="text-sm font-medium text-slate-500">Ventas</p>
-          <strong className="mt-3 block text-3xl font-bold text-slate-900">
+          <strong className="mt-3 block wrap-break-word text-2xl font-bold text-slate-900 lg:text-3xl">
             {formatearDinero(resumen.total_ventas)}
           </strong>
           <p className="mt-2 text-sm text-slate-400">
@@ -126,7 +128,7 @@ function DashboardPage() {
 
         <div className="rounded-2xl bg-white p-6 shadow-sm">
           <p className="text-sm font-medium text-slate-500">Compras</p>
-          <strong className="mt-3 block text-3xl font-bold text-slate-900">
+          <strong className="mt-3 block wrap-break-word text-2xl font-bold text-slate-900 lg:text-3xl">
             {formatearDinero(resumen.total_compras)}
           </strong>
           <p className="mt-2 text-sm text-slate-400">
@@ -137,7 +139,7 @@ function DashboardPage() {
         <div className="rounded-2xl bg-white p-6 shadow-sm">
           <p className="text-sm font-medium text-slate-500">Stock bajo</p>
           <strong
-            className={`mt-3 block text-3xl font-bold ${
+            className={`mt-3 block text-2xl font-bold lg:text-3xl ${
               resumen.productos_stock_bajo > 0
                 ? "text-red-600"
                 : "text-green-700"
@@ -149,12 +151,12 @@ function DashboardPage() {
         </div>
       </section>
 
-      <section className="mt-6 grid grid-cols-3 gap-5">
+      <section className="mt-6 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
         <div className="rounded-2xl bg-white p-6 shadow-sm">
           <p className="text-sm font-medium text-slate-500">
             Proveedores activos
           </p>
-          <strong className="mt-3 block text-3xl font-bold text-slate-900">
+          <strong className="mt-3 block text-2xl font-bold text-slate-900 lg:text-3xl">
             {resumen.total_proveedores}
           </strong>
           <p className="mt-2 text-sm text-slate-400">
@@ -166,7 +168,7 @@ function DashboardPage() {
           <p className="text-sm font-medium text-slate-500">
             Promedio por venta
           </p>
-          <strong className="mt-3 block text-3xl font-bold text-slate-900">
+          <strong className="mt-3 block wrap-break-word text-2xl font-bold text-slate-900 lg:text-3xl">
             {resumen.cantidad_ventas > 0
               ? formatearDinero(resumen.total_ventas / resumen.cantidad_ventas)
               : formatearDinero(0)}
@@ -180,7 +182,7 @@ function DashboardPage() {
           <p className="text-sm font-medium text-slate-500">
             Promedio por compra
           </p>
-          <strong className="mt-3 block text-3xl font-bold text-slate-900">
+          <strong className="mt-3 block wrap-break-word text-2xl font-bold text-slate-900 lg:text-3xl">
             {resumen.cantidad_compras > 0
               ? formatearDinero(
                   resumen.total_compras / resumen.cantidad_compras,

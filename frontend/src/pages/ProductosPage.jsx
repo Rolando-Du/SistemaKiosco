@@ -104,16 +104,18 @@ function ProductosPage() {
   return (
     <div>
       <header className="mb-8 rounded-2xl bg-white p-6 shadow-sm">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
           <div>
-            <h2 className="text-3xl font-bold text-slate-900">Productos</h2>
+            <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl">
+              Productos
+            </h2>
             <p className="mt-2 text-slate-500">
               Listado de productos cargados en el sistema
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
-            <span className="rounded-full bg-blue-100 px-4 py-2 text-sm font-medium text-blue-700">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <span className="w-fit rounded-full bg-blue-100 px-4 py-2 text-sm font-medium text-blue-700">
               {productos.length} productos
             </span>
 
@@ -140,12 +142,15 @@ function ProductosPage() {
       )}
 
       {mostrarFormulario && (
-        <section className="mb-8 rounded-2xl bg-white p-6 shadow-sm">
+        <section className="mb-8 rounded-2xl bg-white p-4 shadow-sm sm:p-6">
           <h3 className="mb-5 text-xl font-bold text-slate-900">
             Nuevo producto
           </h3>
 
-          <form onSubmit={manejarSubmit} className="grid grid-cols-4 gap-4">
+          <form
+            onSubmit={manejarSubmit}
+            className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4"
+          >
             <div>
               <label className="mb-2 block text-sm font-medium text-slate-600">
                 Código
@@ -173,7 +178,7 @@ function ProductosPage() {
               />
             </div>
 
-            <div className="col-span-2">
+            <div className="md:col-span-2">
               <label className="mb-2 block text-sm font-medium text-slate-600">
                 Nombre
               </label>
@@ -267,11 +272,11 @@ function ProductosPage() {
               />
             </div>
 
-            <div className="col-span-4 flex justify-end">
+            <div className="flex justify-end md:col-span-2 xl:col-span-4">
               <button
                 type="submit"
                 disabled={guardando}
-                className="rounded-xl bg-green-600 px-6 py-3 text-sm font-bold text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:bg-slate-400"
+                className="w-full rounded-xl bg-green-600 px-6 py-3 text-sm font-bold text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:bg-slate-400 sm:w-auto"
               >
                 {guardando ? "Guardando..." : "Guardar producto"}
               </button>
@@ -280,9 +285,71 @@ function ProductosPage() {
         </section>
       )}
 
-      <section className="rounded-2xl bg-white p-6 shadow-sm">
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse text-left">
+      <section className="rounded-2xl bg-white p-4 shadow-sm sm:p-6">
+        <div className="md:hidden">
+          <div className="space-y-4">
+            {productos.map((producto) => (
+              <article
+                key={producto.id}
+                className="rounded-2xl border border-slate-100 bg-slate-50 p-4"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-xs font-medium text-slate-400">
+                      Código {producto.codigo}
+                    </p>
+                    <h3 className="mt-1 wrap-break-word font-bold text-slate-900">
+                      {producto.nombre}
+                    </h3>
+                  </div>
+
+                  <span className="shrink-0 rounded-full bg-green-100 px-3 py-1 text-xs font-bold text-green-700">
+                    Activo
+                  </span>
+                </div>
+
+                <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
+                  <div className="rounded-xl bg-white p-3">
+                    <p className="text-slate-500">Stock</p>
+                    <strong
+                      className={`mt-1 block ${
+                        producto.stock <= producto.stock_minimo
+                          ? "text-red-600"
+                          : "text-green-700"
+                      }`}
+                    >
+                      {producto.stock}
+                    </strong>
+                  </div>
+
+                  <div className="rounded-xl bg-white p-3">
+                    <p className="text-slate-500">Stock mínimo</p>
+                    <strong className="mt-1 block text-slate-900">
+                      {producto.stock_minimo}
+                    </strong>
+                  </div>
+
+                  <div className="rounded-xl bg-white p-3">
+                    <p className="text-slate-500">Compra</p>
+                    <strong className="mt-1 block text-slate-900">
+                      ${producto.precio_compra}
+                    </strong>
+                  </div>
+
+                  <div className="rounded-xl bg-white p-3">
+                    <p className="text-slate-500">Venta</p>
+                    <strong className="mt-1 block text-slate-900">
+                      ${producto.precio_venta}
+                    </strong>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+
+        <div className="hidden overflow-x-auto md:block">
+          <table className="min-w-225 border-collapse text-left">
             <thead>
               <tr className="border-b border-slate-200 text-sm text-slate-500">
                 <th className="px-4 py-3">Código</th>

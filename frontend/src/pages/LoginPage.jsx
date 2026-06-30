@@ -42,13 +42,13 @@ function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-950 px-4">
-      <div className="w-full max-w-md rounded-3xl bg-white p-8 shadow-xl">
+    <div className="flex min-h-screen items-center justify-center bg-slate-950 px-4 py-8">
+      <div className="w-full max-w-md rounded-3xl bg-white p-6 shadow-xl sm:p-8">
         <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-slate-900">
+          <h1 className="text-2xl font-bold text-slate-900 sm:text-3xl">
             Sistema Kiosco
           </h1>
-          <p className="mt-2 text-slate-500">
+          <p className="mt-2 text-sm text-slate-500 sm:text-base">
             Ingresá con tu usuario para continuar
           </p>
         </div>

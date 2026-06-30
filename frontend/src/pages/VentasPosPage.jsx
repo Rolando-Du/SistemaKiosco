@@ -47,7 +47,7 @@ function VentasPosPage() {
     setMensaje("");
 
     const productoEnCarrito = carrito.find(
-      (item) => item.producto_id === producto.id
+      (item) => item.producto_id === producto.id,
     );
 
     if (productoEnCarrito) {
@@ -95,7 +95,7 @@ function VentasPosPage() {
           ...item,
           cantidad: cantidadNumero,
         };
-      })
+      }),
     );
   }
 
@@ -154,15 +154,17 @@ function VentasPosPage() {
   return (
     <div>
       <header className="mb-8 rounded-2xl bg-white p-6 shadow-sm">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
           <div>
-            <h2 className="text-3xl font-bold text-slate-900">Ventas POS</h2>
+            <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl">
+              Ventas POS
+            </h2>
             <p className="mt-2 text-slate-500">
               Carga rápida de ventas y descuento automático de stock
             </p>
           </div>
 
-          <span className="rounded-full bg-blue-100 px-4 py-2 text-sm font-medium text-blue-700">
+          <span className="w-fit rounded-full bg-blue-100 px-4 py-2 text-sm font-medium text-blue-700">
             {productos.length} productos disponibles
           </span>
         </div>
@@ -180,30 +182,26 @@ function VentasPosPage() {
         </div>
       )}
 
-      <div className="grid grid-cols-3 gap-6">
-        <section className="col-span-2 rounded-2xl bg-white p-6 shadow-sm">
-          <div className="mb-5 flex items-center justify-between">
-            <div>
-              <h3 className="text-xl font-bold text-slate-900">
-                Productos
-              </h3>
-              <p className="mt-1 text-sm text-slate-500">
-                Tocá un producto para agregarlo a la venta
-              </p>
-            </div>
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+        <section className="rounded-2xl bg-white p-4 shadow-sm sm:p-6 xl:col-span-2">
+          <div className="mb-5">
+            <h3 className="text-xl font-bold text-slate-900">Productos</h3>
+            <p className="mt-1 text-sm text-slate-500">
+              Tocá un producto para agregarlo a la venta
+            </p>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {productos.map((producto) => (
               <button
                 key={producto.id}
                 onClick={() => agregarProducto(producto)}
                 disabled={producto.stock <= 0}
-                className="rounded-2xl border border-slate-200 bg-slate-50 p-5 text-left transition hover:border-blue-400 hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50"
+                className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-left transition hover:border-blue-400 hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50 sm:p-5"
               >
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="font-bold text-slate-900">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                  <div className="min-w-0">
+                    <p className="wrap-break-word font-bold text-slate-900">
                       {producto.nombre}
                     </p>
                     <p className="mt-1 text-sm text-slate-500">
@@ -211,12 +209,12 @@ function VentasPosPage() {
                     </p>
                   </div>
 
-                  <span className="rounded-full bg-green-100 px-3 py-1 text-sm font-bold text-green-700">
+                  <span className="w-fit whitespace-nowrap rounded-full bg-green-100 px-3 py-1 text-sm font-bold text-green-700">
                     ${producto.precio_venta}
                   </span>
                 </div>
 
-                <div className="mt-4 flex items-center justify-between text-sm">
+                <div className="mt-4 flex flex-col gap-1 text-sm sm:flex-row sm:items-center sm:justify-between">
                   <span className="text-slate-500">Stock disponible</span>
                   <strong
                     className={
@@ -233,7 +231,7 @@ function VentasPosPage() {
           </div>
         </section>
 
-        <section className="rounded-2xl bg-white p-6 shadow-sm">
+        <section className="rounded-2xl bg-white p-4 shadow-sm sm:p-6">
           <h3 className="text-xl font-bold text-slate-900">Venta actual</h3>
 
           <div className="mt-4">
@@ -267,8 +265,10 @@ function VentasPosPage() {
                 className="rounded-xl border border-slate-100 bg-slate-50 p-4"
               >
                 <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="font-bold text-slate-900">{item.nombre}</p>
+                  <div className="min-w-0">
+                    <p className="wrap-break-word font-bold text-slate-900">
+                      {item.nombre}
+                    </p>
                     <p className="mt-1 text-sm text-slate-500">
                       ${item.precio_unitario} c/u
                     </p>
@@ -276,7 +276,7 @@ function VentasPosPage() {
 
                   <button
                     onClick={() => quitarProducto(item.producto_id)}
-                    className="rounded-lg bg-red-100 px-2 py-1 text-xs font-bold text-red-700 hover:bg-red-200"
+                    className="shrink-0 rounded-lg bg-red-100 px-2 py-1 text-xs font-bold text-red-700 hover:bg-red-200"
                   >
                     Quitar
                   </button>
@@ -294,7 +294,7 @@ function VentasPosPage() {
                     className="w-24 rounded-lg border border-slate-200 px-3 py-2 outline-none focus:border-blue-500"
                   />
 
-                  <strong className="text-slate-900">
+                  <strong className="wrap-break-word text-slate-900">
                     ${calcularSubtotal(item)}
                   </strong>
                 </div>
@@ -303,9 +303,9 @@ function VentasPosPage() {
           </div>
 
           <div className="mt-6 border-t border-slate-200 pt-5">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-3">
               <span className="text-slate-500">Total</span>
-              <strong className="text-3xl text-slate-900">
+              <strong className="wrap-break-word text-2xl font-bold text-slate-900 sm:text-3xl">
                 ${calcularTotal()}
               </strong>
             </div>

@@ -99,16 +99,18 @@ function ProveedoresPage() {
   return (
     <div>
       <header className="mb-8 rounded-2xl bg-white p-6 shadow-sm">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
           <div>
-            <h2 className="text-3xl font-bold text-slate-900">Proveedores</h2>
+            <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl">
+              Proveedores
+            </h2>
             <p className="mt-2 text-slate-500">
               Listado y alta de proveedores del sistema
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
-            <span className="rounded-full bg-blue-100 px-4 py-2 text-sm font-medium text-blue-700">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <span className="w-fit rounded-full bg-blue-100 px-4 py-2 text-sm font-medium text-blue-700">
               {proveedores.length} proveedores
             </span>
 
@@ -135,12 +137,15 @@ function ProveedoresPage() {
       )}
 
       {mostrarFormulario && (
-        <section className="mb-8 rounded-2xl bg-white p-6 shadow-sm">
+        <section className="mb-8 rounded-2xl bg-white p-4 shadow-sm sm:p-6">
           <h3 className="mb-5 text-xl font-bold text-slate-900">
             Nuevo proveedor
           </h3>
 
-          <form onSubmit={manejarSubmit} className="grid grid-cols-2 gap-4">
+          <form
+            onSubmit={manejarSubmit}
+            className="grid grid-cols-1 gap-4 md:grid-cols-2"
+          >
             <div>
               <label className="mb-2 block text-sm font-medium text-slate-600">
                 Nombre
@@ -198,11 +203,11 @@ function ProveedoresPage() {
               />
             </div>
 
-            <div className="col-span-2 flex justify-end">
+            <div className="flex justify-end md:col-span-2">
               <button
                 type="submit"
                 disabled={guardando}
-                className="rounded-xl bg-green-600 px-6 py-3 text-sm font-bold text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:bg-slate-400"
+                className="w-full rounded-xl bg-green-600 px-6 py-3 text-sm font-bold text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:bg-slate-400 sm:w-auto"
               >
                 {guardando ? "Guardando..." : "Guardar proveedor"}
               </button>
@@ -211,9 +216,57 @@ function ProveedoresPage() {
         </section>
       )}
 
-      <section className="rounded-2xl bg-white p-6 shadow-sm">
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse text-left">
+      <section className="rounded-2xl bg-white p-4 shadow-sm sm:p-6">
+        <div className="md:hidden">
+          <div className="space-y-4">
+            {proveedores.map((proveedor) => (
+              <article
+                key={proveedor.id}
+                className="rounded-2xl border border-slate-100 bg-slate-50 p-4"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <h3 className="wrap-break-word font-bold text-slate-900">
+                      {proveedor.nombre}
+                    </h3>
+                    <p className="mt-1 text-sm text-slate-500">
+                      {proveedor.telefono || "Sin teléfono"}
+                    </p>
+                  </div>
+
+                  <span className="shrink-0 rounded-full bg-green-100 px-3 py-1 text-xs font-bold text-green-700">
+                    Activo
+                  </span>
+                </div>
+
+                <div className="mt-4 grid grid-cols-1 gap-3 text-sm">
+                  <div className="rounded-xl bg-white p-3">
+                    <p className="text-slate-500">Email</p>
+                    <strong className="mt-1 block wrap-break-word text-slate-900">
+                      {proveedor.email || "-"}
+                    </strong>
+                  </div>
+
+                  <div className="rounded-xl bg-white p-3">
+                    <p className="text-slate-500">Dirección</p>
+                    <strong className="mt-1 block wrap-break-word text-slate-900">
+                      {proveedor.direccion || "-"}
+                    </strong>
+                  </div>
+                </div>
+              </article>
+            ))}
+
+            {proveedores.length === 0 && (
+              <div className="rounded-xl bg-slate-50 p-4 text-sm text-slate-500">
+                Todavía no hay proveedores cargados.
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="hidden overflow-x-auto md:block">
+          <table className="min-w-225 border-collapse text-left">
             <thead>
               <tr className="border-b border-slate-200 text-sm text-slate-500">
                 <th className="px-4 py-3">Nombre</th>
@@ -253,6 +306,17 @@ function ProveedoresPage() {
                   </td>
                 </tr>
               ))}
+
+              {proveedores.length === 0 && (
+                <tr>
+                  <td
+                    colSpan="5"
+                    className="px-4 py-8 text-center text-sm text-slate-500"
+                  >
+                    Todavía no hay proveedores cargados.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>

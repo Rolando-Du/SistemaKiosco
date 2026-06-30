@@ -55,12 +55,20 @@ function ComprasPage() {
     setCompras(comprasDatos);
   }
 
+  function obtenerNombreProveedor(idProveedor) {
+    const proveedor = proveedores.find(
+      (item) => item.id === Number(idProveedor),
+    );
+
+    return proveedor ? proveedor.nombre : `Proveedor #${idProveedor}`;
+  }
+
   function manejarProductoSeleccionado(evento) {
     const idSeleccionado = evento.target.value;
     setProductoId(idSeleccionado);
 
     const producto = productos.find(
-      (item) => item.id === Number(idSeleccionado)
+      (item) => item.id === Number(idSeleccionado),
     );
 
     if (producto) {
@@ -97,7 +105,7 @@ function ComprasPage() {
     }
 
     const productoExistente = detalle.find(
-      (item) => item.producto_id === producto.id
+      (item) => item.producto_id === producto.id,
     );
 
     if (productoExistente) {
@@ -112,7 +120,7 @@ function ComprasPage() {
             cantidad: item.cantidad + Number(cantidad),
             precio_unitario: Number(precioUnitario),
           };
-        })
+        }),
       );
     } else {
       setDetalle([
@@ -145,7 +153,7 @@ function ComprasPage() {
           ...item,
           cantidad: cantidadNumero < 1 ? 1 : cantidadNumero,
         };
-      })
+      }),
     );
   }
 
@@ -162,7 +170,7 @@ function ComprasPage() {
           ...item,
           precio_unitario: precioNumero < 0 ? 0 : precioNumero,
         };
-      })
+      }),
     );
   }
 
@@ -228,15 +236,17 @@ function ComprasPage() {
   return (
     <div>
       <header className="mb-8 rounded-2xl bg-white p-6 shadow-sm">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
           <div>
-            <h2 className="text-3xl font-bold text-slate-900">Compras</h2>
+            <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl">
+              Compras
+            </h2>
             <p className="mt-2 text-slate-500">
               Registro de compras a proveedores y actualización de stock
             </p>
           </div>
 
-          <span className="rounded-full bg-blue-100 px-4 py-2 text-sm font-medium text-blue-700">
+          <span className="w-fit rounded-full bg-blue-100 px-4 py-2 text-sm font-medium text-blue-700">
             {compras.length} compras
           </span>
         </div>
@@ -254,8 +264,8 @@ function ComprasPage() {
         </div>
       )}
 
-      <div className="grid grid-cols-3 gap-6">
-        <section className="col-span-2 rounded-2xl bg-white p-6 shadow-sm">
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+        <section className="rounded-2xl bg-white p-4 shadow-sm sm:p-6 xl:col-span-2">
           <h3 className="text-xl font-bold text-slate-900">Nueva compra</h3>
 
           <div className="mt-5">
@@ -278,13 +288,13 @@ function ComprasPage() {
             </select>
           </div>
 
-          <div className="mt-6 rounded-2xl bg-slate-50 p-5">
+          <div className="mt-6 rounded-2xl bg-slate-50 p-4 sm:p-5">
             <h4 className="mb-4 font-bold text-slate-900">
               Agregar producto
             </h4>
 
-            <div className="grid grid-cols-4 gap-4">
-              <div className="col-span-2">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+              <div className="md:col-span-2">
                 <label className="mb-2 block text-sm font-medium text-slate-600">
                   Producto
                 </label>
@@ -332,11 +342,11 @@ function ComprasPage() {
                 />
               </div>
 
-              <div className="col-span-4 flex justify-end">
+              <div className="flex justify-end md:col-span-2 xl:col-span-4">
                 <button
                   type="button"
                   onClick={agregarProducto}
-                  className="rounded-xl bg-blue-600 px-6 py-3 text-sm font-bold text-white transition hover:bg-blue-700"
+                  className="w-full rounded-xl bg-blue-600 px-6 py-3 text-sm font-bold text-white transition hover:bg-blue-700 sm:w-auto"
                 >
                   Agregar a la compra
                 </button>
@@ -356,34 +366,36 @@ function ComprasPage() {
             )}
 
             {detalle.length > 0 && (
-              <div className="overflow-x-auto">
-                <table className="w-full border-collapse text-left">
-                  <thead>
-                    <tr className="border-b border-slate-200 text-sm text-slate-500">
-                      <th className="px-4 py-3">Producto</th>
-                      <th className="px-4 py-3">Cantidad</th>
-                      <th className="px-4 py-3">Precio</th>
-                      <th className="px-4 py-3">Subtotal</th>
-                      <th className="px-4 py-3">Acción</th>
-                    </tr>
-                  </thead>
-
-                  <tbody>
-                    {detalle.map((item) => (
-                      <tr
-                        key={item.producto_id}
-                        className="border-b border-slate-100 text-sm"
-                      >
-                        <td className="px-4 py-4">
-                          <p className="font-bold text-slate-700">
+              <>
+                <div className="space-y-4 md:hidden">
+                  {detalle.map((item) => (
+                    <article
+                      key={item.producto_id}
+                      className="rounded-2xl border border-slate-100 bg-slate-50 p-4"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <p className="wrap-break-word font-bold text-slate-900">
                             {item.nombre}
                           </p>
-                          <p className="text-xs text-slate-400">
+                          <p className="mt-1 text-xs text-slate-400">
                             Código: {item.codigo}
                           </p>
-                        </td>
+                        </div>
 
-                        <td className="px-4 py-4">
+                        <button
+                          onClick={() => quitarProducto(item.producto_id)}
+                          className="shrink-0 rounded-lg bg-red-100 px-3 py-2 text-xs font-bold text-red-700 hover:bg-red-200"
+                        >
+                          Quitar
+                        </button>
+                      </div>
+
+                      <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
+                        <div>
+                          <label className="mb-1 block text-xs font-medium text-slate-500">
+                            Cantidad
+                          </label>
                           <input
                             type="number"
                             min="1"
@@ -391,14 +403,17 @@ function ComprasPage() {
                             onChange={(evento) =>
                               cambiarCantidad(
                                 item.producto_id,
-                                evento.target.value
+                                evento.target.value,
                               )
                             }
-                            className="w-24 rounded-lg border border-slate-200 px-3 py-2 outline-none focus:border-blue-500"
+                            className="w-full rounded-lg border border-slate-200 px-3 py-2 outline-none focus:border-blue-500"
                           />
-                        </td>
+                        </div>
 
-                        <td className="px-4 py-4">
+                        <div>
+                          <label className="mb-1 block text-xs font-medium text-slate-500">
+                            Precio
+                          </label>
                           <input
                             type="number"
                             min="0"
@@ -406,44 +421,113 @@ function ComprasPage() {
                             onChange={(evento) =>
                               cambiarPrecio(
                                 item.producto_id,
-                                evento.target.value
+                                evento.target.value,
                               )
                             }
-                            className="w-28 rounded-lg border border-slate-200 px-3 py-2 outline-none focus:border-blue-500"
+                            className="w-full rounded-lg border border-slate-200 px-3 py-2 outline-none focus:border-blue-500"
                           />
-                        </td>
+                        </div>
 
-                        <td className="px-4 py-4 font-bold text-slate-700">
-                          ${calcularSubtotal(item)}
-                        </td>
+                        <div className="rounded-xl bg-white p-3">
+                          <p className="text-xs text-slate-500">Subtotal</p>
+                          <strong className="mt-1 block text-slate-900">
+                            ${calcularSubtotal(item)}
+                          </strong>
+                        </div>
+                      </div>
+                    </article>
+                  ))}
+                </div>
 
-                        <td className="px-4 py-4">
-                          <button
-                            onClick={() => quitarProducto(item.producto_id)}
-                            className="rounded-lg bg-red-100 px-3 py-2 text-xs font-bold text-red-700 hover:bg-red-200"
-                          >
-                            Quitar
-                          </button>
-                        </td>
+                <div className="hidden overflow-x-auto md:block">
+                  <table className="min-w-190 border-collapse text-left">
+                    <thead>
+                      <tr className="border-b border-slate-200 text-sm text-slate-500">
+                        <th className="px-4 py-3">Producto</th>
+                        <th className="px-4 py-3">Cantidad</th>
+                        <th className="px-4 py-3">Precio</th>
+                        <th className="px-4 py-3">Subtotal</th>
+                        <th className="px-4 py-3">Acción</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                    </thead>
+
+                    <tbody>
+                      {detalle.map((item) => (
+                        <tr
+                          key={item.producto_id}
+                          className="border-b border-slate-100 text-sm"
+                        >
+                          <td className="px-4 py-4">
+                            <p className="font-bold text-slate-700">
+                              {item.nombre}
+                            </p>
+                            <p className="text-xs text-slate-400">
+                              Código: {item.codigo}
+                            </p>
+                          </td>
+
+                          <td className="px-4 py-4">
+                            <input
+                              type="number"
+                              min="1"
+                              value={item.cantidad}
+                              onChange={(evento) =>
+                                cambiarCantidad(
+                                  item.producto_id,
+                                  evento.target.value,
+                                )
+                              }
+                              className="w-24 rounded-lg border border-slate-200 px-3 py-2 outline-none focus:border-blue-500"
+                            />
+                          </td>
+
+                          <td className="px-4 py-4">
+                            <input
+                              type="number"
+                              min="0"
+                              value={item.precio_unitario}
+                              onChange={(evento) =>
+                                cambiarPrecio(
+                                  item.producto_id,
+                                  evento.target.value,
+                                )
+                              }
+                              className="w-28 rounded-lg border border-slate-200 px-3 py-2 outline-none focus:border-blue-500"
+                            />
+                          </td>
+
+                          <td className="px-4 py-4 font-bold text-slate-700">
+                            ${calcularSubtotal(item)}
+                          </td>
+
+                          <td className="px-4 py-4">
+                            <button
+                              onClick={() => quitarProducto(item.producto_id)}
+                              className="rounded-lg bg-red-100 px-3 py-2 text-xs font-bold text-red-700 hover:bg-red-200"
+                            >
+                              Quitar
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </>
             )}
           </div>
         </section>
 
-        <section className="rounded-2xl bg-white p-6 shadow-sm">
+        <section className="rounded-2xl bg-white p-4 shadow-sm sm:p-6">
           <h3 className="text-xl font-bold text-slate-900">Resumen</h3>
 
           <div className="mt-5 space-y-4">
             <div className="rounded-xl bg-slate-50 p-4">
               <p className="text-sm text-slate-500">Proveedor seleccionado</p>
-              <strong className="mt-2 block text-slate-900">
+              <strong className="mt-2 block wrap-break-word text-slate-900">
                 {proveedorId
                   ? proveedores.find(
-                      (proveedor) => proveedor.id === Number(proveedorId)
+                      (proveedor) => proveedor.id === Number(proveedorId),
                     )?.nombre
                   : "Sin seleccionar"}
               </strong>
@@ -458,7 +542,7 @@ function ComprasPage() {
 
             <div className="rounded-xl bg-slate-50 p-4">
               <p className="text-sm text-slate-500">Total compra</p>
-              <strong className="mt-2 block text-3xl text-slate-900">
+              <strong className="mt-2 block wrap-break-word text-2xl text-slate-900 sm:text-3xl">
                 ${calcularTotal()}
               </strong>
             </div>
@@ -474,13 +558,56 @@ function ComprasPage() {
         </section>
       </div>
 
-      <section className="mt-8 rounded-2xl bg-white p-6 shadow-sm">
+      <section className="mt-8 rounded-2xl bg-white p-4 shadow-sm sm:p-6">
         <h3 className="mb-5 text-xl font-bold text-slate-900">
           Compras registradas
         </h3>
 
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse text-left">
+        <div className="space-y-4 md:hidden">
+          {compras.map((compra) => (
+            <article
+              key={compra.id}
+              className="rounded-2xl border border-slate-100 bg-slate-50 p-4"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-xs text-slate-400">Compra</p>
+                  <strong className="text-slate-900">#{compra.id}</strong>
+                </div>
+
+                <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-bold text-green-700">
+                  {compra.estado}
+                </span>
+              </div>
+
+              <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <div className="rounded-xl bg-white p-3">
+                  <p className="text-sm text-slate-500">Proveedor</p>
+                  <strong className="mt-1 block wrap-break-word text-slate-900">
+                    {obtenerNombreProveedor(compra.proveedor_id)}
+                  </strong>
+                </div>
+
+                <div className="rounded-xl bg-white p-3">
+                  <p className="text-sm text-slate-500">Total</p>
+                  <strong className="mt-1 block text-slate-900">
+                    ${compra.total}
+                  </strong>
+                </div>
+
+                <div className="rounded-xl bg-white p-3 sm:col-span-2">
+                  <p className="text-sm text-slate-500">Fecha</p>
+                  <strong className="mt-1 block wrap-break-word text-slate-900">
+                    {new Date(compra.fecha_creacion).toLocaleString()}
+                  </strong>
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+
+        <div className="hidden overflow-x-auto md:block">
+          <table className="min-w-190 border-collapse text-left">
             <thead>
               <tr className="border-b border-slate-200 text-sm text-slate-500">
                 <th className="px-4 py-3">N°</th>
@@ -502,7 +629,7 @@ function ComprasPage() {
                   </td>
 
                   <td className="px-4 py-4 text-slate-600">
-                    Proveedor #{compra.proveedor_id}
+                    {obtenerNombreProveedor(compra.proveedor_id)}
                   </td>
 
                   <td className="px-4 py-4 font-bold text-slate-700">
