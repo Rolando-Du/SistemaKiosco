@@ -3,6 +3,50 @@
 
 Registro de cambios principales del proyecto **Sistema Kiosco**.
 
+## [1.1.0] - Gestión mejorada de productos y proveedores
+
+### Agregado
+
+- Edición de productos desde el backend.
+- Eliminación lógica de productos desde el backend.
+- Edición de productos desde el frontend.
+- Eliminación de productos desde el frontend.
+- Generación automática de código interno para productos.
+- Edición de proveedores desde el backend.
+- Eliminación lógica de proveedores desde el backend.
+- Edición de proveedores desde el frontend.
+- Eliminación de proveedores desde el frontend.
+
+### Backend
+
+- Agregados endpoints para obtener producto por ID.
+- Agregados endpoints para actualizar productos.
+- Agregados endpoints para eliminar productos de forma lógica.
+- Agregada generación automática de códigos de productos con formato `PRD-0001`.
+- El código de barras quedó como dato opcional.
+- Agregados endpoints para obtener proveedor por ID.
+- Agregados endpoints para actualizar proveedores.
+- Agregados endpoints para eliminar proveedores de forma lógica.
+- Mejoradas las validaciones básicas en productos y proveedores.
+
+### Frontend
+
+- Agregados botones **Editar** y **Eliminar** en la pantalla de productos.
+- Agregado formulario reutilizable para crear y editar productos.
+- El código interno del producto ahora se genera automáticamente.
+- Agregados botones **Editar** y **Eliminar** en la pantalla de proveedores.
+- Agregado formulario reutilizable para crear y editar proveedores.
+- Agregados mensajes visuales de creación, actualización y eliminación.
+- Actualización automática de los listados luego de crear, editar o eliminar.
+
+### Repositorio
+
+- Trabajo realizado en la rama `desarrollo-v1.1.0`.
+- Cambios probados con build correcto del frontend.
+- Cambios subidos a GitHub.
+
+---
+
 ## [1.0.0] - Versión inicial funcional
 
 ### Agregado
@@ -82,8 +126,6 @@ Registro de cambios principales del proyecto **Sistema Kiosco**.
 
 ## Próximas mejoras posibles
 
-- Agregar edición y eliminación de productos.
-- Agregar edición y eliminación de proveedores.
 - Agregar detalle completo de ventas.
 - Agregar detalle completo de compras.
 - Agregar filtros por fecha en historiales.
