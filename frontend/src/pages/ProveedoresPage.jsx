@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 
 import {
   crearProveedor,
+  editarProveedor,
+  eliminarProveedor,
   obtenerProveedores,
 } from "../services/proveedoresService";
 
@@ -16,8 +18,10 @@ function ProveedoresPage() {
   const [proveedores, setProveedores] = useState([]);
   const [formulario, setFormulario] = useState(formularioInicial);
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
+  const [proveedorEditandoId, setProveedorEditandoId] = useState(null);
   const [cargando, setCargando] = useState(true);
   const [guardando, setGuardando] = useState(false);
+  const [eliminandoId, setEliminandoId] = useState(null);
   const [error, setError] = useState("");
   const [mensaje, setMensaje] = useState("");
 
@@ -60,6 +64,40 @@ function ProveedoresPage() {
     });
   }
 
+  function abrirFormularioNuevo() {
+    setProveedorEditandoId(null);
+    setFormulario(formularioInicial);
+    setMostrarFormulario(true);
+    setError("");
+    setMensaje("");
+  }
+
+  function cancelarFormulario() {
+    setProveedorEditandoId(null);
+    setFormulario(formularioInicial);
+    setMostrarFormulario(false);
+    setError("");
+  }
+
+  function prepararEdicion(proveedor) {
+    setProveedorEditandoId(proveedor.id);
+    setFormulario({
+      nombre: proveedor.nombre || "",
+      telefono: proveedor.telefono || "",
+      email: proveedor.email || "",
+      direccion: proveedor.direccion || "",
+    });
+
+    setMostrarFormulario(true);
+    setError("");
+    setMensaje("");
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  }
+
   async function manejarSubmit(evento) {
     evento.preventDefault();
 
@@ -68,23 +106,60 @@ function ProveedoresPage() {
       setError("");
       setMensaje("");
 
-      const nuevoProveedor = {
+      const proveedorFormulario = {
         nombre: formulario.nombre,
         telefono: formulario.telefono || null,
         email: formulario.email || null,
         direccion: formulario.direccion || null,
       };
 
-      await crearProveedor(nuevoProveedor);
+      if (proveedorEditandoId) {
+        await editarProveedor(proveedorEditandoId, proveedorFormulario);
+        setMensaje("Proveedor actualizado correctamente.");
+      } else {
+        await crearProveedor(proveedorFormulario);
+        setMensaje("Proveedor creado correctamente.");
+      }
 
-      setMensaje("Proveedor creado correctamente.");
       setFormulario(formularioInicial);
+      setProveedorEditandoId(null);
       setMostrarFormulario(false);
       await recargarProveedores();
     } catch (error) {
       setError(error.message);
     } finally {
       setGuardando(false);
+    }
+  }
+
+  async function manejarEliminar(proveedor) {
+    const confirmado = window.confirm(
+      `¿Seguro que querés eliminar el proveedor "${proveedor.nombre}"?`,
+    );
+
+    if (!confirmado) {
+      return;
+    }
+
+    try {
+      setEliminandoId(proveedor.id);
+      setError("");
+      setMensaje("");
+
+      await eliminarProveedor(proveedor.id);
+
+      if (proveedorEditandoId === proveedor.id) {
+        setProveedorEditandoId(null);
+        setFormulario(formularioInicial);
+        setMostrarFormulario(false);
+      }
+
+      setMensaje("Proveedor eliminado correctamente.");
+      await recargarProveedores();
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setEliminandoId(null);
     }
   }
 
@@ -115,7 +190,9 @@ function ProveedoresPage() {
             </span>
 
             <button
-              onClick={() => setMostrarFormulario(!mostrarFormulario)}
+              onClick={
+                mostrarFormulario ? cancelarFormulario : abrirFormularioNuevo
+              }
               className="rounded-xl bg-blue-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-blue-700"
             >
               {mostrarFormulario ? "Cancelar" : "+ Nuevo proveedor"}
@@ -139,7 +216,7 @@ function ProveedoresPage() {
       {mostrarFormulario && (
         <section className="mb-8 rounded-2xl bg-white p-4 shadow-sm sm:p-6">
           <h3 className="mb-5 text-xl font-bold text-slate-900">
-            Nuevo proveedor
+            {proveedorEditandoId ? "Editar proveedor" : "Nuevo proveedor"}
           </h3>
 
           <form
@@ -203,13 +280,25 @@ function ProveedoresPage() {
               />
             </div>
 
-            <div className="flex justify-end md:col-span-2">
+            <div className="flex flex-col gap-3 md:col-span-2 md:flex-row md:justify-end">
+              <button
+                type="button"
+                onClick={cancelarFormulario}
+                className="w-full rounded-xl bg-slate-200 px-6 py-3 text-sm font-bold text-slate-700 transition hover:bg-slate-300 md:w-auto"
+              >
+                Cancelar
+              </button>
+
               <button
                 type="submit"
                 disabled={guardando}
-                className="w-full rounded-xl bg-green-600 px-6 py-3 text-sm font-bold text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:bg-slate-400 sm:w-auto"
+                className="w-full rounded-xl bg-green-600 px-6 py-3 text-sm font-bold text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:bg-slate-400 md:w-auto"
               >
-                {guardando ? "Guardando..." : "Guardar proveedor"}
+                {guardando
+                  ? "Guardando..."
+                  : proveedorEditandoId
+                    ? "Actualizar proveedor"
+                    : "Guardar proveedor"}
               </button>
             </div>
           </form>
@@ -254,6 +343,27 @@ function ProveedoresPage() {
                     </strong>
                   </div>
                 </div>
+
+                <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+                  <button
+                    type="button"
+                    onClick={() => prepararEdicion(proveedor)}
+                    className="w-full rounded-xl bg-amber-100 px-4 py-3 text-sm font-bold text-amber-700 transition hover:bg-amber-200"
+                  >
+                    Editar
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => manejarEliminar(proveedor)}
+                    disabled={eliminandoId === proveedor.id}
+                    className="w-full rounded-xl bg-red-100 px-4 py-3 text-sm font-bold text-red-700 transition hover:bg-red-200 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-500"
+                  >
+                    {eliminandoId === proveedor.id
+                      ? "Eliminando..."
+                      : "Eliminar"}
+                  </button>
+                </div>
               </article>
             ))}
 
@@ -266,7 +376,7 @@ function ProveedoresPage() {
         </div>
 
         <div className="hidden overflow-x-auto md:block">
-          <table className="min-w-225 border-collapse text-left">
+          <table className="min-w-250 border-collapse text-left">
             <thead>
               <tr className="border-b border-slate-200 text-sm text-slate-500">
                 <th className="px-4 py-3">Nombre</th>
@@ -274,6 +384,7 @@ function ProveedoresPage() {
                 <th className="px-4 py-3">Email</th>
                 <th className="px-4 py-3">Dirección</th>
                 <th className="px-4 py-3">Estado</th>
+                <th className="px-4 py-3">Acciones</th>
               </tr>
             </thead>
 
@@ -304,13 +415,36 @@ function ProveedoresPage() {
                       Activo
                     </span>
                   </td>
+
+                  <td className="px-4 py-4">
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => prepararEdicion(proveedor)}
+                        className="rounded-lg bg-amber-100 px-3 py-2 text-xs font-bold text-amber-700 transition hover:bg-amber-200"
+                      >
+                        Editar
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => manejarEliminar(proveedor)}
+                        disabled={eliminandoId === proveedor.id}
+                        className="rounded-lg bg-red-100 px-3 py-2 text-xs font-bold text-red-700 transition hover:bg-red-200 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-500"
+                      >
+                        {eliminandoId === proveedor.id
+                          ? "Eliminando..."
+                          : "Eliminar"}
+                      </button>
+                    </div>
+                  </td>
                 </tr>
               ))}
 
               {proveedores.length === 0 && (
                 <tr>
                   <td
-                    colSpan="5"
+                    colSpan="6"
                     className="px-4 py-8 text-center text-sm text-slate-500"
                   >
                     Todavía no hay proveedores cargados.
