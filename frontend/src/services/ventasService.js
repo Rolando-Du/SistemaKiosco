@@ -10,6 +10,22 @@ export async function obtenerVentas() {
   return await respuesta.json();
 }
 
+export async function obtenerDetalleVenta(ventaId) {
+  const respuesta = await fetch(`${API_URL}/ventas/${ventaId}`);
+
+  if (!respuesta.ok) {
+    throw new Error("No se pudo obtener el detalle de la venta.");
+  }
+
+  const datos = await respuesta.json();
+
+  if (datos.encontrada === false) {
+    throw new Error(datos.mensaje || "No se pudo obtener el detalle de la venta.");
+  }
+
+  return datos;
+}
+
 export async function crearVenta(venta) {
   const respuesta = await fetch(`${API_URL}/ventas/`, {
     method: "POST",
