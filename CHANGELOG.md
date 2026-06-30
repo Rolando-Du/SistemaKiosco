@@ -3,6 +3,40 @@
 
 Registro de cambios principales del proyecto **Sistema Kiosco**.
 
+## [1.3.0] - Detalle completo de compras
+
+### Agregado
+
+- Agregado detalle completo de compras en el historial.
+- Agregado botón **Ver detalle** en cada compra.
+- Visualización de productos comprados por compra.
+- Visualización de cantidad, precio unitario y subtotal por producto.
+- Visualización del proveedor, total, estado y fecha de la compra.
+
+### Frontend
+
+- Agregada función `obtenerDetalleCompra` en el servicio de compras.
+- Mejorada la pantalla de historial de compras.
+- Agregada sección visual para consultar el detalle completo de una compra.
+- Agregada versión responsive del detalle para pantallas chicas.
+- Agregada tabla de detalle para escritorio.
+- Agregado scroll automático hacia el detalle al seleccionar una compra.
+- Agregada columna **Acciones** en el historial de compras.
+
+### Backend
+
+- Se reutilizó el endpoint existente `GET /compras/{compra_id}`.
+- Se aprovechó la información ya disponible de `CompraDetalle`.
+- El backend ya devolvía productos, cantidades, precios unitarios y subtotales.
+
+### Repositorio
+
+- Trabajo realizado en la rama `desarrollo-v1.3.0`.
+- Cambios probados desde la interfaz.
+- Cambios subidos a GitHub.
+
+---
+
 ## [1.2.0] - Detalle completo de ventas
 
 ### Agregado
@@ -159,7 +193,6 @@ Registro de cambios principales del proyecto **Sistema Kiosco**.
 
 ## Próximas mejoras posibles
 
-- Agregar detalle completo de compras.
 - Agregar filtros por fecha en historiales.
 - Agregar exportación a PDF o Excel.
 - Mejorar control de usuarios y roles.
