@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 
-import { obtenerCompras } from "../services/comprasService";
+import {
+  obtenerCompras,
+  obtenerDetalleCompra,
+} from "../services/comprasService";
 import { obtenerProveedores } from "../services/proveedoresService";
 
 function formatearDinero(valor) {
@@ -11,11 +14,18 @@ function formatearDinero(valor) {
   }).format(valor);
 }
 
+function formatearFecha(fecha) {
+  return new Date(fecha).toLocaleString("es-AR");
+}
+
 function HistorialComprasPage() {
   const [compras, setCompras] = useState([]);
   const [proveedores, setProveedores] = useState([]);
+  const [compraSeleccionada, setCompraSeleccionada] = useState(null);
+  const [detalleCompra, setDetalleCompra] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [actualizando, setActualizando] = useState(false);
+  const [cargandoDetalleId, setCargandoDetalleId] = useState(null);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -63,6 +73,35 @@ function HistorialComprasPage() {
     }
   }
 
+  async function verDetalleCompra(compraId) {
+    try {
+      setCargandoDetalleId(compraId);
+      setError("");
+
+      const datos = await obtenerDetalleCompra(compraId);
+
+      setCompraSeleccionada(datos.compra);
+      setDetalleCompra(datos.detalle || []);
+
+      setTimeout(() => {
+        const detalle = document.getElementById("detalle-compra");
+        detalle?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }, 100);
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setCargandoDetalleId(null);
+    }
+  }
+
+  function cerrarDetalle() {
+    setCompraSeleccionada(null);
+    setDetalleCompra([]);
+  }
+
   function obtenerNombreProveedor(proveedorId) {
     const proveedor = proveedores.find(
       (item) => item.id === Number(proveedorId),
@@ -73,6 +112,13 @@ function HistorialComprasPage() {
 
   function calcularTotalComprado() {
     return compras.reduce((total, compra) => total + Number(compra.total), 0);
+  }
+
+  function calcularCantidadProductosDetalle() {
+    return detalleCompra.reduce(
+      (total, producto) => total + Number(producto.cantidad),
+      0,
+    );
   }
 
   if (cargando) {
@@ -140,6 +186,119 @@ function HistorialComprasPage() {
         </div>
       </section>
 
+      {compraSeleccionada && (
+        <section
+          id="detalle-compra"
+          className="mb-6 rounded-2xl bg-white p-4 shadow-sm sm:p-6"
+        >
+          <div className="mb-6 flex flex-col gap-4 border-b border-slate-100 pb-5 lg:flex-row lg:items-start lg:justify-between">
+            <div>
+              <p className="text-sm font-medium text-blue-600">
+                Detalle completo
+              </p>
+              <h3 className="mt-1 text-2xl font-bold text-slate-900">
+                Compra #{compraSeleccionada.id}
+              </h3>
+              <p className="mt-2 text-sm text-slate-500">
+                Fecha: {formatearFecha(compraSeleccionada.fecha_creacion)}
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={cerrarDetalle}
+              className="w-full rounded-xl bg-slate-200 px-5 py-3 text-sm font-bold text-slate-700 transition hover:bg-slate-300 sm:w-auto"
+            >
+              Cerrar detalle
+            </button>
+          </div>
+
+          <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+            <div className="rounded-xl bg-slate-50 p-4">
+              <p className="text-sm text-slate-500">Proveedor</p>
+              <strong className="mt-1 block wrap-break-word text-xl text-slate-900">
+                {obtenerNombreProveedor(compraSeleccionada.proveedor_id)}
+              </strong>
+            </div>
+
+            <div className="rounded-xl bg-slate-50 p-4">
+              <p className="text-sm text-slate-500">Total</p>
+              <strong className="mt-1 block text-xl text-slate-900">
+                {formatearDinero(compraSeleccionada.total)}
+              </strong>
+            </div>
+
+            <div className="rounded-xl bg-slate-50 p-4">
+              <p className="text-sm text-slate-500">Productos comprados</p>
+              <strong className="mt-1 block text-xl text-slate-900">
+                {calcularCantidadProductosDetalle()}
+              </strong>
+            </div>
+
+            <div className="rounded-xl bg-slate-50 p-4">
+              <p className="text-sm text-slate-500">Estado</p>
+              <strong className="mt-1 inline-block rounded-full bg-green-100 px-3 py-1 text-xs font-bold text-green-700">
+                {compraSeleccionada.estado}
+              </strong>
+            </div>
+          </div>
+
+          <div className="hidden overflow-x-auto md:block">
+            <table className="min-w-200 border-collapse text-left">
+              <thead>
+                <tr className="border-b border-slate-200 text-sm text-slate-500">
+                  <th className="px-4 py-3">Código</th>
+                  <th className="px-4 py-3">Producto</th>
+                  <th className="px-4 py-3">Cantidad</th>
+                  <th className="px-4 py-3">Precio unitario</th>
+                  <th className="px-4 py-3">Subtotal</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {detalleCompra.map((producto) => (
+                  <tr
+                    key={`${producto.producto_id}-${producto.nombre}`}
+                    className="border-b border-slate-100 text-sm"
+                  >
+                    <td className="px-4 py-4 font-bold text-slate-700">
+                      {producto.codigo}
+                    </td>
+
+                    <td className="px-4 py-4 text-slate-600">
+                      {producto.nombre}
+                    </td>
+
+                    <td className="px-4 py-4 text-slate-600">
+                      {producto.cantidad}
+                    </td>
+
+                    <td className="px-4 py-4 text-slate-600">
+                      {formatearDinero(producto.precio_unitario)}
+                    </td>
+
+                    <td className="px-4 py-4 font-bold text-slate-900">
+                      {formatearDinero(producto.subtotal)}
+                    </td>
+                  </tr>
+                ))}
+
+                {detalleCompra.length === 0 && (
+                  <tr>
+                    <td
+                      colSpan="5"
+                      className="px-4 py-8 text-center text-sm text-slate-500"
+                    >
+                      Esta compra no tiene productos cargados.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
+
       <section className="rounded-2xl bg-white p-4 shadow-sm sm:p-6">
         <div className="space-y-4 md:hidden">
           {compras.map((compra) => (
@@ -183,10 +342,21 @@ function HistorialComprasPage() {
                 <div className="rounded-xl bg-white p-3">
                   <p className="text-sm text-slate-500">Fecha</p>
                   <strong className="mt-1 block wrap-break-word text-slate-900">
-                    {new Date(compra.fecha_creacion).toLocaleString()}
+                    {formatearFecha(compra.fecha_creacion)}
                   </strong>
                 </div>
               </div>
+
+              <button
+                type="button"
+                onClick={() => verDetalleCompra(compra.id)}
+                disabled={cargandoDetalleId === compra.id}
+                className="mt-4 w-full rounded-xl bg-blue-100 px-4 py-3 text-sm font-bold text-blue-700 transition hover:bg-blue-200 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-500"
+              >
+                {cargandoDetalleId === compra.id
+                  ? "Cargando detalle..."
+                  : "Ver detalle"}
+              </button>
             </article>
           ))}
 
@@ -198,7 +368,7 @@ function HistorialComprasPage() {
         </div>
 
         <div className="hidden overflow-x-auto md:block">
-          <table className="min-w-225 border-collapse text-left">
+          <table className="min-w-262.5 border-collapse text-left">
             <thead>
               <tr className="border-b border-slate-200 text-sm text-slate-500">
                 <th className="px-4 py-3">N° compra</th>
@@ -207,6 +377,7 @@ function HistorialComprasPage() {
                 <th className="px-4 py-3">Estado</th>
                 <th className="px-4 py-3">Usuario</th>
                 <th className="px-4 py-3">Fecha</th>
+                <th className="px-4 py-3">Acciones</th>
               </tr>
             </thead>
 
@@ -239,7 +410,20 @@ function HistorialComprasPage() {
                   </td>
 
                   <td className="px-4 py-4 text-slate-600">
-                    {new Date(compra.fecha_creacion).toLocaleString()}
+                    {formatearFecha(compra.fecha_creacion)}
+                  </td>
+
+                  <td className="px-4 py-4">
+                    <button
+                      type="button"
+                      onClick={() => verDetalleCompra(compra.id)}
+                      disabled={cargandoDetalleId === compra.id}
+                      className="rounded-lg bg-blue-100 px-3 py-2 text-xs font-bold text-blue-700 transition hover:bg-blue-200 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-500"
+                    >
+                      {cargandoDetalleId === compra.id
+                        ? "Cargando..."
+                        : "Ver detalle"}
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -247,7 +431,7 @@ function HistorialComprasPage() {
               {compras.length === 0 && (
                 <tr>
                   <td
-                    colSpan="6"
+                    colSpan="7"
                     className="px-4 py-8 text-center text-sm text-slate-500"
                   >
                     Todavía no hay compras registradas.

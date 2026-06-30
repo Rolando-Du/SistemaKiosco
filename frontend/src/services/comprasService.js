@@ -10,6 +10,24 @@ export async function obtenerCompras() {
   return await respuesta.json();
 }
 
+export async function obtenerDetalleCompra(compraId) {
+  const respuesta = await fetch(`${API_URL}/compras/${compraId}`);
+
+  if (!respuesta.ok) {
+    throw new Error("No se pudo obtener el detalle de la compra.");
+  }
+
+  const datos = await respuesta.json();
+
+  if (datos.encontrada === false) {
+    throw new Error(
+      datos.mensaje || "No se pudo obtener el detalle de la compra.",
+    );
+  }
+
+  return datos;
+}
+
 export async function crearCompra(compra) {
   const respuesta = await fetch(`${API_URL}/compras/`, {
     method: "POST",
