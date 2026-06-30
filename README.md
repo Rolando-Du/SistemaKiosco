@@ -68,6 +68,7 @@ SistemaKiosco/
 │
 ├── backups/
 ├── docs/
+│   └── screenshots/
 ├── .gitignore
 └── README.md
 ```
@@ -204,9 +205,48 @@ GET /reportes/resumen
 * Historial de compras
 * Proveedores
 
+## Capturas del sistema
+
+### Login
+
+![Pantalla de login](docs/screenshots/login.png)
+
+### Dashboard
+
+![Dashboard](docs/screenshots/dashboard.png)
+
+### Productos
+
+![Productos](docs/screenshots/productos.png)
+
+### Ventas POS
+
+![Ventas POS](docs/screenshots/ventas-pos.png)
+
+### Caja
+
+![Caja](docs/screenshots/caja.png)
+
+### Compras
+
+![Compras](docs/screenshots/compras.png)
+
+### Proveedores
+
+![Proveedores](docs/screenshots/proveedores.png)
+
+### Historial de ventas
+
+![Historial de ventas](docs/screenshots/historial-ventas.png)
+
+### Historial de compras
+
+![Historial de compras](docs/screenshots/historial-compras.png)
+
 ## Estado actual del proyecto
 
 El proyecto cuenta con un backend funcional, un frontend conectado al backend y una interfaz responsive.
+
 También se encuentra versionado con Git y subido a GitHub.
 
 ## Repositorio
@@ -217,4 +257,4 @@ https://github.com/Rolando-Du/SistemaKiosco
 
 ## Autor
 
-Desarrollado por Rolando Duarte
+Desarrollado por Rolando Duarte.
