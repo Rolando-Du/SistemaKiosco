@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react";
 
-import { crearProducto, obtenerProductos } from "../services/productosService";
+import {
+  crearProducto,
+  editarProducto,
+  eliminarProducto,
+  obtenerProductos,
+} from "../services/productosService";
 
 const formularioInicial = {
   codigo: "",
@@ -17,8 +22,10 @@ function ProductosPage() {
   const [productos, setProductos] = useState([]);
   const [formulario, setFormulario] = useState(formularioInicial);
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
+  const [productoEditandoId, setProductoEditandoId] = useState(null);
   const [cargando, setCargando] = useState(true);
   const [guardando, setGuardando] = useState(false);
+  const [eliminandoId, setEliminandoId] = useState(null);
   const [error, setError] = useState("");
   const [mensaje, setMensaje] = useState("");
 
@@ -61,6 +68,44 @@ function ProductosPage() {
     });
   }
 
+  function abrirFormularioNuevo() {
+    setProductoEditandoId(null);
+    setFormulario(formularioInicial);
+    setMostrarFormulario(true);
+    setError("");
+    setMensaje("");
+  }
+
+  function cancelarFormulario() {
+    setProductoEditandoId(null);
+    setFormulario(formularioInicial);
+    setMostrarFormulario(false);
+    setError("");
+  }
+
+  function prepararEdicion(producto) {
+    setProductoEditandoId(producto.id);
+    setFormulario({
+      codigo: producto.codigo || "",
+      codigo_barras: producto.codigo_barras || "",
+      nombre: producto.nombre || "",
+      categoria_id: String(producto.categoria_id || "1"),
+      precio_compra: String(producto.precio_compra ?? ""),
+      precio_venta: String(producto.precio_venta ?? ""),
+      stock: String(producto.stock ?? ""),
+      stock_minimo: String(producto.stock_minimo ?? ""),
+    });
+
+    setMostrarFormulario(true);
+    setError("");
+    setMensaje("");
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  }
+
   async function manejarSubmit(evento) {
     evento.preventDefault();
 
@@ -69,8 +114,8 @@ function ProductosPage() {
       setError("");
       setMensaje("");
 
-      const nuevoProducto = {
-        codigo: formulario.codigo,
+      const productoFormulario = {
+        codigo: productoEditandoId ? formulario.codigo : null,
         codigo_barras: formulario.codigo_barras || null,
         nombre: formulario.nombre,
         categoria_id: Number(formulario.categoria_id),
@@ -80,16 +125,53 @@ function ProductosPage() {
         stock_minimo: Number(formulario.stock_minimo),
       };
 
-      await crearProducto(nuevoProducto);
+      if (productoEditandoId) {
+        await editarProducto(productoEditandoId, productoFormulario);
+        setMensaje("Producto actualizado correctamente.");
+      } else {
+        await crearProducto(productoFormulario);
+        setMensaje("Producto creado correctamente.");
+      }
 
-      setMensaje("Producto creado correctamente.");
       setFormulario(formularioInicial);
+      setProductoEditandoId(null);
       setMostrarFormulario(false);
       await recargarProductos();
     } catch (error) {
       setError(error.message);
     } finally {
       setGuardando(false);
+    }
+  }
+
+  async function manejarEliminar(producto) {
+    const confirmado = window.confirm(
+      `¿Seguro que querés eliminar el producto "${producto.nombre}"?`,
+    );
+
+    if (!confirmado) {
+      return;
+    }
+
+    try {
+      setEliminandoId(producto.id);
+      setError("");
+      setMensaje("");
+
+      await eliminarProducto(producto.id);
+
+      if (productoEditandoId === producto.id) {
+        setProductoEditandoId(null);
+        setFormulario(formularioInicial);
+        setMostrarFormulario(false);
+      }
+
+      setMensaje("Producto eliminado correctamente.");
+      await recargarProductos();
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setEliminandoId(null);
     }
   }
 
@@ -120,7 +202,9 @@ function ProductosPage() {
             </span>
 
             <button
-              onClick={() => setMostrarFormulario(!mostrarFormulario)}
+              onClick={
+                mostrarFormulario ? cancelarFormulario : abrirFormularioNuevo
+              }
               className="rounded-xl bg-blue-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-blue-700"
             >
               {mostrarFormulario ? "Cancelar" : "+ Nuevo producto"}
@@ -144,7 +228,7 @@ function ProductosPage() {
       {mostrarFormulario && (
         <section className="mb-8 rounded-2xl bg-white p-4 shadow-sm sm:p-6">
           <h3 className="mb-5 text-xl font-bold text-slate-900">
-            Nuevo producto
+            {productoEditandoId ? "Editar producto" : "Nuevo producto"}
           </h3>
 
           <form
@@ -155,20 +239,29 @@ function ProductosPage() {
               <label className="mb-2 block text-sm font-medium text-slate-600">
                 Código
               </label>
+
               <input
                 type="text"
                 name="codigo"
-                value={formulario.codigo}
-                onChange={manejarCambio}
-                required
-                className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-blue-500"
+                value={
+                  productoEditandoId
+                    ? formulario.codigo
+                    : "Se genera automáticamente"
+                }
+                readOnly
+                className="w-full cursor-not-allowed rounded-xl border border-slate-200 bg-slate-100 px-4 py-3 text-slate-500 outline-none"
               />
+
+              <p className="mt-1 text-xs text-slate-400">
+                El código interno lo genera el sistema.
+              </p>
             </div>
 
             <div>
               <label className="mb-2 block text-sm font-medium text-slate-600">
                 Código de barras
               </label>
+
               <input
                 type="text"
                 name="codigo_barras"
@@ -182,6 +275,7 @@ function ProductosPage() {
               <label className="mb-2 block text-sm font-medium text-slate-600">
                 Nombre
               </label>
+
               <input
                 type="text"
                 name="nombre"
@@ -196,6 +290,7 @@ function ProductosPage() {
               <label className="mb-2 block text-sm font-medium text-slate-600">
                 Categoría
               </label>
+
               <select
                 name="categoria_id"
                 value={formulario.categoria_id}
@@ -216,6 +311,7 @@ function ProductosPage() {
               <label className="mb-2 block text-sm font-medium text-slate-600">
                 Precio compra
               </label>
+
               <input
                 type="number"
                 name="precio_compra"
@@ -231,6 +327,7 @@ function ProductosPage() {
               <label className="mb-2 block text-sm font-medium text-slate-600">
                 Precio venta
               </label>
+
               <input
                 type="number"
                 name="precio_venta"
@@ -246,6 +343,7 @@ function ProductosPage() {
               <label className="mb-2 block text-sm font-medium text-slate-600">
                 Stock
               </label>
+
               <input
                 type="number"
                 name="stock"
@@ -261,6 +359,7 @@ function ProductosPage() {
               <label className="mb-2 block text-sm font-medium text-slate-600">
                 Stock mínimo
               </label>
+
               <input
                 type="number"
                 name="stock_minimo"
@@ -272,13 +371,25 @@ function ProductosPage() {
               />
             </div>
 
-            <div className="flex justify-end md:col-span-2 xl:col-span-4">
+            <div className="flex flex-col gap-3 md:col-span-2 md:flex-row md:justify-end xl:col-span-4">
+              <button
+                type="button"
+                onClick={cancelarFormulario}
+                className="w-full rounded-xl bg-slate-200 px-6 py-3 text-sm font-bold text-slate-700 transition hover:bg-slate-300 md:w-auto"
+              >
+                Cancelar
+              </button>
+
               <button
                 type="submit"
                 disabled={guardando}
-                className="w-full rounded-xl bg-green-600 px-6 py-3 text-sm font-bold text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:bg-slate-400 sm:w-auto"
+                className="w-full rounded-xl bg-green-600 px-6 py-3 text-sm font-bold text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:bg-slate-400 md:w-auto"
               >
-                {guardando ? "Guardando..." : "Guardar producto"}
+                {guardando
+                  ? "Guardando..."
+                  : productoEditandoId
+                    ? "Actualizar producto"
+                    : "Guardar producto"}
               </button>
             </div>
           </form>
@@ -343,13 +454,40 @@ function ProductosPage() {
                     </strong>
                   </div>
                 </div>
+
+                <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+                  <button
+                    type="button"
+                    onClick={() => prepararEdicion(producto)}
+                    className="w-full rounded-xl bg-amber-100 px-4 py-3 text-sm font-bold text-amber-700 transition hover:bg-amber-200"
+                  >
+                    Editar
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => manejarEliminar(producto)}
+                    disabled={eliminandoId === producto.id}
+                    className="w-full rounded-xl bg-red-100 px-4 py-3 text-sm font-bold text-red-700 transition hover:bg-red-200 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-500"
+                  >
+                    {eliminandoId === producto.id
+                      ? "Eliminando..."
+                      : "Eliminar"}
+                  </button>
+                </div>
               </article>
             ))}
+
+            {productos.length === 0 && (
+              <div className="rounded-xl bg-slate-50 p-4 text-sm text-slate-500">
+                Todavía no hay productos cargados.
+              </div>
+            )}
           </div>
         </div>
 
         <div className="hidden overflow-x-auto md:block">
-          <table className="min-w-225 border-collapse text-left">
+          <table className="min-w-262.5 border-collapse text-left">
             <thead>
               <tr className="border-b border-slate-200 text-sm text-slate-500">
                 <th className="px-4 py-3">Código</th>
@@ -359,6 +497,7 @@ function ProductosPage() {
                 <th className="px-4 py-3">Precio compra</th>
                 <th className="px-4 py-3">Precio venta</th>
                 <th className="px-4 py-3">Estado</th>
+                <th className="px-4 py-3">Acciones</th>
               </tr>
             </thead>
 
@@ -405,8 +544,42 @@ function ProductosPage() {
                       Activo
                     </span>
                   </td>
+
+                  <td className="px-4 py-4">
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => prepararEdicion(producto)}
+                        className="rounded-lg bg-amber-100 px-3 py-2 text-xs font-bold text-amber-700 transition hover:bg-amber-200"
+                      >
+                        Editar
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => manejarEliminar(producto)}
+                        disabled={eliminandoId === producto.id}
+                        className="rounded-lg bg-red-100 px-3 py-2 text-xs font-bold text-red-700 transition hover:bg-red-200 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-500"
+                      >
+                        {eliminandoId === producto.id
+                          ? "Eliminando..."
+                          : "Eliminar"}
+                      </button>
+                    </div>
+                  </td>
                 </tr>
               ))}
+
+              {productos.length === 0 && (
+                <tr>
+                  <td
+                    colSpan="8"
+                    className="px-4 py-8 text-center text-sm text-slate-500"
+                  >
+                    Todavía no hay productos cargados.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
