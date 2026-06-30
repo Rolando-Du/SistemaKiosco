@@ -69,6 +69,19 @@ function MainLayout() {
               </NavLink>
 
               <NavLink
+                to="/historial-ventas"
+                className={({ isActive }) =>
+                  `rounded-xl px-4 py-3 text-sm font-medium transition ${
+                    isActive
+                      ? "bg-blue-600 text-white"
+                      : "bg-slate-800 text-slate-200 hover:bg-slate-700"
+                  }`
+                }
+              >
+                Historial de ventas
+              </NavLink>
+
+              <NavLink
                 to="/caja"
                 className={({ isActive }) =>
                   `rounded-xl px-4 py-3 text-sm font-medium transition ${

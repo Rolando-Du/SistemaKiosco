@@ -1,5 +1,15 @@
 import { API_URL } from "../config/api";
 
+export async function obtenerVentas() {
+  const respuesta = await fetch(`${API_URL}/ventas/`);
+
+  if (!respuesta.ok) {
+    throw new Error("No se pudieron obtener las ventas.");
+  }
+
+  return await respuesta.json();
+}
+
 export async function crearVenta(venta) {
   const respuesta = await fetch(`${API_URL}/ventas/`, {
     method: "POST",

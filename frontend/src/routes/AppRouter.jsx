@@ -5,6 +5,7 @@ import MainLayout from "../layouts/MainLayout";
 import CajaPage from "../pages/CajaPage";
 import ComprasPage from "../pages/ComprasPage";
 import DashboardPage from "../pages/DashboardPage";
+import HistorialVentasPage from "../pages/HistorialVentasPage";
 import LoginPage from "../pages/LoginPage";
 import ProductosPage from "../pages/ProductosPage";
 import ProveedoresPage from "../pages/ProveedoresPage";
@@ -22,6 +23,7 @@ function AppRouter() {
             <Route path="dashboard" element={<DashboardPage />} />
             <Route path="productos" element={<ProductosPage />} />
             <Route path="ventas-pos" element={<VentasPosPage />} />
+            <Route path="historial-ventas" element={<HistorialVentasPage />} />
             <Route path="caja" element={<CajaPage />} />
             <Route path="compras" element={<ComprasPage />} />
             <Route path="proveedores" element={<ProveedoresPage />} />
