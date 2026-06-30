@@ -5,6 +5,7 @@ import MainLayout from "../layouts/MainLayout";
 import CajaPage from "../pages/CajaPage";
 import ComprasPage from "../pages/ComprasPage";
 import DashboardPage from "../pages/DashboardPage";
+import HistorialComprasPage from "../pages/HistorialComprasPage";
 import HistorialVentasPage from "../pages/HistorialVentasPage";
 import LoginPage from "../pages/LoginPage";
 import ProductosPage from "../pages/ProductosPage";
@@ -26,6 +27,10 @@ function AppRouter() {
             <Route path="historial-ventas" element={<HistorialVentasPage />} />
             <Route path="caja" element={<CajaPage />} />
             <Route path="compras" element={<ComprasPage />} />
+            <Route
+              path="historial-compras"
+              element={<HistorialComprasPage />}
+            />
             <Route path="proveedores" element={<ProveedoresPage />} />
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Route>
