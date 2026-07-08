@@ -6,6 +6,11 @@ import {
 } from "../services/comprasService";
 import { obtenerProveedores } from "../services/proveedoresService";
 
+const filtrosIniciales = {
+  fechaDesde: "",
+  fechaHasta: "",
+};
+
 function formatearDinero(valor) {
   return new Intl.NumberFormat("es-AR", {
     style: "currency",
@@ -18,11 +23,30 @@ function formatearFecha(fecha) {
   return new Date(fecha).toLocaleString("es-AR");
 }
 
+function crearFechaDesde(valor) {
+  if (!valor) {
+    return null;
+  }
+
+  return new Date(`${valor}T00:00:00`);
+}
+
+function crearFechaHasta(valor) {
+  if (!valor) {
+    return null;
+  }
+
+  return new Date(`${valor}T23:59:59.999`);
+}
+
 function HistorialComprasPage() {
   const [compras, setCompras] = useState([]);
   const [proveedores, setProveedores] = useState([]);
   const [compraSeleccionada, setCompraSeleccionada] = useState(null);
   const [detalleCompra, setDetalleCompra] = useState([]);
+  const [filtrosFormulario, setFiltrosFormulario] =
+    useState(filtrosIniciales);
+  const [filtrosAplicados, setFiltrosAplicados] = useState(filtrosIniciales);
   const [cargando, setCargando] = useState(true);
   const [actualizando, setActualizando] = useState(false);
   const [cargandoDetalleId, setCargandoDetalleId] = useState(null);
@@ -102,6 +126,50 @@ function HistorialComprasPage() {
     setDetalleCompra([]);
   }
 
+  function manejarCambioFiltro(evento) {
+    const { name, value } = evento.target;
+
+    setFiltrosFormulario({
+      ...filtrosFormulario,
+      [name]: value,
+    });
+  }
+
+  function manejarFiltrar(evento) {
+    evento.preventDefault();
+    setFiltrosAplicados(filtrosFormulario);
+    cerrarDetalle();
+  }
+
+  function limpiarFiltros() {
+    setFiltrosFormulario(filtrosIniciales);
+    setFiltrosAplicados(filtrosIniciales);
+    cerrarDetalle();
+  }
+
+  function obtenerComprasFiltradas() {
+    const fechaDesde = crearFechaDesde(filtrosAplicados.fechaDesde);
+    const fechaHasta = crearFechaHasta(filtrosAplicados.fechaHasta);
+
+    return compras.filter((compra) => {
+      const fechaCompra = new Date(compra.fecha_creacion);
+
+      if (fechaDesde && fechaCompra < fechaDesde) {
+        return false;
+      }
+
+      if (fechaHasta && fechaCompra > fechaHasta) {
+        return false;
+      }
+
+      return true;
+    });
+  }
+
+  const comprasFiltradas = obtenerComprasFiltradas();
+  const filtrosActivos =
+    filtrosAplicados.fechaDesde || filtrosAplicados.fechaHasta;
+
   function obtenerNombreProveedor(proveedorId) {
     const proveedor = proveedores.find(
       (item) => item.id === Number(proveedorId),
@@ -111,7 +179,10 @@ function HistorialComprasPage() {
   }
 
   function calcularTotalComprado() {
-    return compras.reduce((total, compra) => total + Number(compra.total), 0);
+    return comprasFiltradas.reduce(
+      (total, compra) => total + Number(compra.total),
+      0,
+    );
   }
 
   function calcularCantidadProductosDetalle() {
@@ -158,28 +229,117 @@ function HistorialComprasPage() {
         </div>
       )}
 
+      <section className="mb-6 rounded-2xl bg-white p-4 shadow-sm sm:p-6">
+        <div className="mb-5">
+          <h3 className="text-xl font-bold text-slate-900">
+            Filtros por fecha
+          </h3>
+          <p className="mt-1 text-sm text-slate-500">
+            Filtrá las compras por un rango de fechas.
+          </p>
+        </div>
+
+        <form
+          onSubmit={manejarFiltrar}
+          className="grid grid-cols-1 gap-4 md:grid-cols-4"
+        >
+          <div>
+            <label className="mb-2 block text-sm font-medium text-slate-600">
+              Fecha desde
+            </label>
+
+            <input
+              type="date"
+              name="fechaDesde"
+              value={filtrosFormulario.fechaDesde}
+              onChange={manejarCambioFiltro}
+              className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-blue-500"
+            />
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-medium text-slate-600">
+              Fecha hasta
+            </label>
+
+            <input
+              type="date"
+              name="fechaHasta"
+              value={filtrosFormulario.fechaHasta}
+              onChange={manejarCambioFiltro}
+              className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-blue-500"
+            />
+          </div>
+
+          <div className="flex items-end">
+            <button
+              type="submit"
+              className="w-full rounded-xl bg-blue-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-blue-700"
+            >
+              Filtrar
+            </button>
+          </div>
+
+          <div className="flex items-end">
+            <button
+              type="button"
+              onClick={limpiarFiltros}
+              className="w-full rounded-xl bg-slate-200 px-5 py-3 text-sm font-bold text-slate-700 transition hover:bg-slate-300"
+            >
+              Limpiar filtros
+            </button>
+          </div>
+        </form>
+
+        <div className="mt-5 rounded-xl bg-slate-50 p-4 text-sm text-slate-600">
+          {filtrosActivos ? (
+            <p>
+              Mostrando <strong>{comprasFiltradas.length}</strong> de{" "}
+              <strong>{compras.length}</strong> compras registradas.
+            </p>
+          ) : (
+            <p>
+              Mostrando todas las compras registradas:{" "}
+              <strong>{compras.length}</strong>.
+            </p>
+          )}
+        </div>
+      </section>
+
       <section className="mb-6 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
         <div className="rounded-2xl bg-white p-6 shadow-sm">
-          <p className="text-sm font-medium text-slate-500">Compras</p>
+          <p className="text-sm font-medium text-slate-500">
+            {filtrosActivos ? "Compras filtradas" : "Compras"}
+          </p>
           <strong className="mt-3 block text-2xl font-bold text-slate-900 sm:text-3xl">
-            {compras.length}
+            {comprasFiltradas.length}
           </strong>
-          <p className="mt-2 text-sm text-slate-400">Total registradas</p>
+          <p className="mt-2 text-sm text-slate-400">
+            {filtrosActivos ? "Total del período" : "Total registradas"}
+          </p>
         </div>
 
         <div className="rounded-2xl bg-white p-6 shadow-sm">
-          <p className="text-sm font-medium text-slate-500">Total comprado</p>
+          <p className="text-sm font-medium text-slate-500">
+            {filtrosActivos ? "Total comprado filtrado" : "Total comprado"}
+          </p>
           <strong className="mt-3 block wrap-break-word text-2xl font-bold text-slate-900 sm:text-3xl">
             {formatearDinero(calcularTotalComprado())}
           </strong>
-          <p className="mt-2 text-sm text-slate-400">Importe acumulado</p>
+          <p className="mt-2 text-sm text-slate-400">
+            {filtrosActivos ? "Importe del período" : "Importe acumulado"}
+          </p>
         </div>
 
         <div className="rounded-2xl bg-white p-6 shadow-sm">
-          <p className="text-sm font-medium text-slate-500">Promedio</p>
+          <p className="text-sm font-medium text-slate-500">
+            {filtrosActivos ? "Promedio filtrado" : "Promedio"}
+          </p>
           <strong className="mt-3 block wrap-break-word text-2xl font-bold text-slate-900 sm:text-3xl">
-            {compras.length > 0
-              ? formatearDinero(calcularTotalComprado() / compras.length)
+            {comprasFiltradas.length > 0
+              ? formatearDinero(
+                  calcularTotalComprado() / comprasFiltradas.length,
+                )
               : formatearDinero(0)}
           </strong>
           <p className="mt-2 text-sm text-slate-400">Promedio por compra</p>
@@ -243,6 +403,49 @@ function HistorialComprasPage() {
             </div>
           </div>
 
+          <div className="md:hidden">
+            <div className="space-y-3">
+              {detalleCompra.map((producto) => (
+                <article
+                  key={`${producto.producto_id}-${producto.nombre}`}
+                  className="rounded-2xl border border-slate-100 bg-slate-50 p-4"
+                >
+                  <div>
+                    <p className="text-xs text-slate-400">
+                      Código: {producto.codigo}
+                    </p>
+                    <h4 className="mt-1 wrap-break-word font-bold text-slate-900">
+                      {producto.nombre}
+                    </h4>
+                  </div>
+
+                  <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
+                    <div className="rounded-xl bg-white p-3">
+                      <p className="text-sm text-slate-500">Cantidad</p>
+                      <strong className="mt-1 block text-slate-900">
+                        {producto.cantidad}
+                      </strong>
+                    </div>
+
+                    <div className="rounded-xl bg-white p-3">
+                      <p className="text-sm text-slate-500">Precio unitario</p>
+                      <strong className="mt-1 block text-slate-900">
+                        {formatearDinero(producto.precio_unitario)}
+                      </strong>
+                    </div>
+
+                    <div className="rounded-xl bg-white p-3">
+                      <p className="text-sm text-slate-500">Subtotal</p>
+                      <strong className="mt-1 block text-slate-900">
+                        {formatearDinero(producto.subtotal)}
+                      </strong>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+
           <div className="hidden overflow-x-auto md:block">
             <table className="min-w-200 border-collapse text-left">
               <thead>
@@ -301,7 +504,7 @@ function HistorialComprasPage() {
 
       <section className="rounded-2xl bg-white p-4 shadow-sm sm:p-6">
         <div className="space-y-4 md:hidden">
-          {compras.map((compra) => (
+          {comprasFiltradas.map((compra) => (
             <article
               key={compra.id}
               className="rounded-2xl border border-slate-100 bg-slate-50 p-4"
@@ -360,9 +563,9 @@ function HistorialComprasPage() {
             </article>
           ))}
 
-          {compras.length === 0 && (
+          {comprasFiltradas.length === 0 && (
             <div className="rounded-xl bg-slate-50 p-4 text-sm text-slate-500">
-              Todavía no hay compras registradas.
+              No hay compras para el rango de fechas seleccionado.
             </div>
           )}
         </div>
@@ -382,7 +585,7 @@ function HistorialComprasPage() {
             </thead>
 
             <tbody>
-              {compras.map((compra) => (
+              {comprasFiltradas.map((compra) => (
                 <tr
                   key={compra.id}
                   className="border-b border-slate-100 text-sm hover:bg-slate-50"
@@ -428,13 +631,13 @@ function HistorialComprasPage() {
                 </tr>
               ))}
 
-              {compras.length === 0 && (
+              {comprasFiltradas.length === 0 && (
                 <tr>
                   <td
                     colSpan="7"
                     className="px-4 py-8 text-center text-sm text-slate-500"
                   >
-                    Todavía no hay compras registradas.
+                    No hay compras para el rango de fechas seleccionado.
                   </td>
                 </tr>
               )}
