@@ -5,6 +5,10 @@ import {
   obtenerDetalleCompra,
 } from "../services/comprasService";
 import { obtenerProveedores } from "../services/proveedoresService";
+import {
+  descargarCsv,
+  generarNombreArchivo,
+} from "../utils/exportarCsv";
 
 const filtrosIniciales = {
   fechaDesde: "",
@@ -192,6 +196,30 @@ function HistorialComprasPage() {
     );
   }
 
+  function exportarComprasCsv() {
+    const columnas = [
+      { titulo: "N° compra", clave: "id" },
+      { titulo: "Proveedor", clave: "proveedor" },
+      { titulo: "Total", clave: "total" },
+      { titulo: "Estado", clave: "estado" },
+      { titulo: "Usuario", clave: "usuario" },
+      { titulo: "Fecha", clave: "fecha" },
+    ];
+
+    const filas = comprasFiltradas.map((compra) => ({
+      id: compra.id,
+      proveedor: obtenerNombreProveedor(compra.proveedor_id),
+      total: compra.total,
+      estado: compra.estado,
+      usuario: `Usuario #${compra.usuario_id}`,
+      fecha: formatearFecha(compra.fecha_creacion),
+    }));
+
+    const nombreArchivo = generarNombreArchivo("historial-compras");
+
+    descargarCsv(nombreArchivo, columnas, filas);
+  }
+
   if (cargando) {
     return (
       <div className="rounded-2xl bg-white p-6 shadow-sm">
@@ -213,13 +241,23 @@ function HistorialComprasPage() {
             </p>
           </div>
 
-          <button
-            onClick={actualizarCompras}
-            disabled={actualizando}
-            className="w-full rounded-xl bg-blue-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-400 sm:w-auto"
-          >
-            {actualizando ? "Actualizando..." : "Actualizar compras"}
-          </button>
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <button
+              onClick={exportarComprasCsv}
+              disabled={comprasFiltradas.length === 0}
+              className="w-full rounded-xl bg-green-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:bg-slate-400 sm:w-auto"
+            >
+              Exportar compras
+            </button>
+
+            <button
+              onClick={actualizarCompras}
+              disabled={actualizando}
+              className="w-full rounded-xl bg-blue-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-400 sm:w-auto"
+            >
+              {actualizando ? "Actualizando..." : "Actualizar compras"}
+            </button>
+          </div>
         </div>
       </header>
 

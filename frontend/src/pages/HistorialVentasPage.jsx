@@ -4,6 +4,10 @@ import {
   obtenerDetalleVenta,
   obtenerVentas,
 } from "../services/ventasService";
+import {
+  descargarCsv,
+  generarNombreArchivo,
+} from "../utils/exportarCsv";
 
 const filtrosIniciales = {
   fechaDesde: "",
@@ -176,6 +180,30 @@ function HistorialVentasPage() {
     );
   }
 
+  function exportarVentasCsv() {
+    const columnas = [
+      { titulo: "N° venta", clave: "id" },
+      { titulo: "Total", clave: "total" },
+      { titulo: "Método de pago", clave: "metodo_pago" },
+      { titulo: "Estado", clave: "estado" },
+      { titulo: "Usuario", clave: "usuario" },
+      { titulo: "Fecha", clave: "fecha" },
+    ];
+
+    const filas = ventasFiltradas.map((venta) => ({
+      id: venta.id,
+      total: venta.total,
+      metodo_pago: venta.metodo_pago,
+      estado: venta.estado,
+      usuario: `Usuario #${venta.usuario_id}`,
+      fecha: formatearFecha(venta.fecha_creacion),
+    }));
+
+    const nombreArchivo = generarNombreArchivo("historial-ventas");
+
+    descargarCsv(nombreArchivo, columnas, filas);
+  }
+
   if (cargando) {
     return (
       <div className="rounded-2xl bg-white p-6 shadow-sm">
@@ -197,13 +225,23 @@ function HistorialVentasPage() {
             </p>
           </div>
 
-          <button
-            onClick={actualizarVentas}
-            disabled={actualizando}
-            className="w-full rounded-xl bg-blue-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-400 sm:w-auto"
-          >
-            {actualizando ? "Actualizando..." : "Actualizar ventas"}
-          </button>
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <button
+              onClick={exportarVentasCsv}
+              disabled={ventasFiltradas.length === 0}
+              className="w-full rounded-xl bg-green-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:bg-slate-400 sm:w-auto"
+            >
+              Exportar ventas
+            </button>
+
+            <button
+              onClick={actualizarVentas}
+              disabled={actualizando}
+              className="w-full rounded-xl bg-blue-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-400 sm:w-auto"
+            >
+              {actualizando ? "Actualizando..." : "Actualizar ventas"}
+            </button>
+          </div>
         </div>
       </header>
 
