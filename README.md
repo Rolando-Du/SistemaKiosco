@@ -1,215 +1,221 @@
+<div align="center">
 
-# Sistema Kiosco
+# 🏪 Sistema Kiosco
 
-Sistema de gestión para kiosco, librería e impresiones desarrollado con **FastAPI**, **SQLite**, **React**, **Vite** y **Tailwind CSS**.
+### Gestión de productos, ventas, compras, proveedores y caja
 
-El sistema permite administrar productos, stock, ventas, compras, proveedores, caja diaria, reportes e historial de operaciones.
+[![React](https://img.shields.io/badge/React-19-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://react.dev/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.138-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![SQLite](https://img.shields.io/badge/SQLite-Database-003B57?style=for-the-badge&logo=sqlite&logoColor=white)](https://sqlite.org/)
+[![CI](https://img.shields.io/github/actions/workflow/status/Rolando-Du/SistemaKiosco/ci.yml?branch=master&style=for-the-badge&label=CI)](https://github.com/Rolando-Du/SistemaKiosco/actions)
 
-## Funcionalidades principales
+</div>
 
-* Login de usuarios.
-* Rutas protegidas en el frontend.
-* Dashboard con resumen general del sistema.
-* Gestión de productos.
-* Alta de productos desde el frontend.
-* Ventas POS con descuento automático de stock.
-* Historial de ventas.
-* Apertura y cierre de caja.
-* Gestión de proveedores.
-* Registro de compras a proveedores.
-* Aumento automático de stock al registrar compras.
-* Historial de compras.
-* Interfaz responsive para escritorio y pantallas chicas.
+---
 
-## Tecnologías utilizadas
+## Descripción
 
-### Backend
+Sistema full stack para la gestión integral de un **kiosco, librería e impresiones**.
 
-* Python
-* FastAPI
-* SQLAlchemy
-* SQLite
-* Uvicorn
+Permite administrar productos y stock, registrar ventas y compras, operar la caja diaria, gestionar proveedores y consultar historiales desde una interfaz web responsive conectada a una API desarrollada con FastAPI.
+
+---
+
+## Funcionalidades
+
+- Login de usuarios.
+- Rutas protegidas.
+- Dashboard general.
+- Alta y gestión de productos.
+- Control de stock.
+- Ventas POS.
+- Descuento automático de stock al vender.
+- Historial de ventas.
+- Apertura y cierre de caja.
+- Gestión de proveedores.
+- Registro de compras.
+- Incremento automático de stock al comprar.
+- Historial de compras.
+- Reportes resumidos.
+- Interfaz responsive.
+- Integración continua con GitHub Actions.
+
+---
+
+## Stack
 
 ### Frontend
 
-* React
-* Vite
-* Tailwind CSS
-* React Router
-* pnpm
+```text
+React 19
+Vite 8
+Tailwind CSS 4
+React Router
+ESLint
+```
 
-### Control de versiones
+### Backend
 
-* Git
-* GitHub
+```text
+Python 3
+FastAPI
+SQLAlchemy
+SQLite
+Uvicorn
+Pydantic
+bcrypt / passlib
+```
 
-## Estructura general del proyecto
+---
+
+## Arquitectura
+
+```text
+Usuario
+  ↓
+React + Vite
+  ↓
+Pages / Services
+  ↓
+FastAPI
+  ↓
+Routers / Services
+  ↓
+SQLAlchemy
+  ↓
+SQLite
+```
+
+---
+
+## Estructura
 
 ```text
 SistemaKiosco/
+├── .github/
+│   └── workflows/
+│       └── ci.yml
 ├── backend/
-│   ├── app.py
 │   ├── database/
 │   ├── routers/
 │   ├── seguridad/
 │   ├── services/
+│   ├── app.py
 │   └── requirements.txt
-│
 ├── frontend/
-│   ├── src/
-│   │   ├── auth/
-│   │   ├── config/
-│   │   ├── layouts/
-│   │   ├── pages/
-│   │   ├── routes/
-│   │   └── services/
-│   └── package.json
-│
-├── backups/
+│   └── src/
+│       ├── auth/
+│       ├── config/
+│       ├── layouts/
+│       ├── pages/
+│       ├── routes/
+│       └── services/
 ├── docs/
 │   └── screenshots/
-├── .gitignore
+├── CHANGELOG.md
 └── README.md
 ```
 
-## Cómo ejecutar el backend
+---
 
-Entrar a la carpeta del backend:
+## Instalación
+
+### Backend
 
 ```bash
 cd backend
+python -m venv entorno
 ```
 
-Activar el entorno virtual:
+En Windows / Git Bash:
 
 ```bash
 source ./entorno/Scripts/activate
 ```
 
-Levantar el servidor:
+Instalar dependencias:
+
+```bash
+pip install -r requirements.txt
+```
+
+Ejecutar:
 
 ```bash
 python -m uvicorn app:app --reload
 ```
 
-El backend queda disponible en:
+API:
 
 ```text
 http://127.0.0.1:8000
 ```
 
-La documentación automática de la API se puede ver en:
+Swagger:
 
 ```text
 http://127.0.0.1:8000/docs
 ```
 
-## Cómo ejecutar el frontend
-
-Entrar a la carpeta del frontend:
+### Frontend
 
 ```bash
 cd frontend
-```
-
-Instalar dependencias:
-
-```bash
 pnpm install
-```
-
-Levantar el frontend:
-
-```bash
 pnpm dev
 ```
 
-El frontend queda disponible en:
+Frontend:
 
 ```text
 http://localhost:5173
 ```
 
-## Usuario de prueba
+---
 
-```text
-Usuario: admin
-Contraseña: admin123
-Rol: ADMIN
-```
+## Acceso de prueba
+
+El proyecto puede inicializar usuarios de desarrollo según la configuración local utilizada.
+
+Por seguridad, **las contraseñas de prueba no se publican en el README**. Si se crea un usuario demo, sus credenciales deben mantenerse fuera del repositorio y cambiarse antes de compartir un ambiente accesible públicamente.
+
+---
 
 ## Endpoints principales
 
-### Usuarios
-
 ```text
 POST /usuarios/login
-```
 
-### Productos
-
-```text
 GET  /productos/
 POST /productos/
 GET  /productos/buscar
 GET  /productos/stock-bajo
-```
 
-### Ventas
-
-```text
 GET  /ventas/
 POST /ventas/
 GET  /ventas/{venta_id}
-```
 
-### Caja
-
-```text
 GET  /caja/abierta
 POST /caja/abrir
 POST /caja/cerrar
-```
 
-### Proveedores
-
-```text
 GET  /proveedores/
 POST /proveedores/
-```
 
-### Compras
-
-```text
 GET  /compras/
 POST /compras/
 GET  /compras/{compra_id}
-```
 
-### Reportes
-
-```text
 GET /reportes/resumen
 ```
 
-## Pantallas del sistema
+---
 
-* Login
-* Dashboard
-* Productos
-* Ventas POS
-* Historial de ventas
-* Caja
-* Compras
-* Historial de compras
-* Proveedores
-
-## Capturas del sistema
+## Capturas
 
 ### Login
 
-![Pantalla de login](docs/screenshots/login.png)
+![Login](docs/screenshots/login.png)
 
 ### Dashboard
 
@@ -243,18 +249,59 @@ GET /reportes/resumen
 
 ![Historial de compras](docs/screenshots/historial-compras.png)
 
-## Estado actual del proyecto
+---
 
-El proyecto cuenta con un backend funcional, un frontend conectado al backend y una interfaz responsive.
+## CI
 
-También se encuentra versionado con Git y subido a GitHub.
-
-## Repositorio
+GitHub Actions ejecuta validaciones automáticas en cada push y pull request a `master`:
 
 ```text
-https://github.com/Rolando-Du/SistemaKiosco
+Backend  → instalación + compilación de fuentes Python
+Frontend → instalación + lint + build
 ```
+
+---
+
+## Seguridad
+
+- No publicar credenciales reales ni demo reutilizables.
+- No versionar secretos o variables sensibles.
+- Cambiar contraseñas iniciales antes de exponer un ambiente.
+- Mantener dependencias actualizadas.
+- Revisar los datos de la base antes de compartir copias o backups.
+
+---
+
+## Estado
+
+```text
+✓ autenticación
+✓ dashboard
+✓ productos
+✓ stock
+✓ ventas POS
+✓ historial de ventas
+✓ caja
+✓ compras
+✓ proveedores
+✓ reportes
+✓ frontend responsive
+✓ API FastAPI
+✓ CI
+```
+
+---
+
+## Changelog
+
+La evolución detallada del proyecto se encuentra en:
+
+**[CHANGELOG.md](./CHANGELOG.md)**
+
+---
 
 ## Autor
 
-Desarrollado por Rolando Duarte.
+Desarrollado por **Rolando Duarte**.
+
+[![GitHub](https://img.shields.io/badge/GitHub-Rolando--Du-181717?style=for-the-badge&logo=github)](https://github.com/Rolando-Du)
